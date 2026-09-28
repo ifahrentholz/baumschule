@@ -71,7 +71,6 @@ describe("createCmsConfig", () => {
       "email",
       "vat_id",
       "logo",
-      "brand_colors",
     ]);
   });
 });

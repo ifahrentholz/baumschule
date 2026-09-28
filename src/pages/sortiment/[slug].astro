@@ -1,0 +1,17 @@
+---
+// One shell per assortment category; the categories come from the
+// navigation tree until the content collection (#5 onwards) takes over.
+import type { GetStaticPaths } from "astro";
+import PageShell from "../../layouts/PageShell.astro";
+import { ASSORTMENT_CATEGORIES } from "../../navigation";
+
+export const getStaticPaths = (() =>
+  ASSORTMENT_CATEGORIES.map(({ path }) => ({
+    params: { slug: path.split("/").at(-2) },
+    props: { path },
+  }))) satisfies GetStaticPaths;
+
+const { path } = Astro.props;
+---
+
+<PageShell path={path} />

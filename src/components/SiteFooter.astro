@@ -1,58 +1,190 @@
 ---
-// Minimal footer with the company data from the Settings singleton; styled in
-// the design system ticket (#4). Blank fields are left out.
-import { loadSiteSettings } from "../site-settings";
+// Site footer: company data from the Settings singleton, the full page tree
+// as a sitemap, and the legal pages. Blank Settings fields are left out.
+import { LEGAL_NAV, MAIN_NAV, withBase } from "../navigation";
 import { telHref } from "../settings";
+import { loadSiteSettings } from "../site-settings";
 
 const settings = loadSiteSettings();
 const { street, postal_code, city } = settings.address;
 const place = [postal_code, city].filter(Boolean).join(" ");
+const base = import.meta.env.BASE_URL;
+const year = new Date().getFullYear();
 ---
 
-<footer>
-  <address>
-    <strong>{settings.company_name}</strong>
-    {settings.operators.length > 0 && (
-      <>
-        <br />
-        Inhaber: {settings.operators.join(", ")}
-      </>
-    )}
-    {street && (
-      <>
-        <br />
-        {street}
-      </>
-    )}
-    {place && (
-      <>
-        <br />
-        {place}
-      </>
-    )}
-    {settings.phone && (
-      <>
-        <br />
-        Telefon: <a href={telHref(settings.phone)}>{settings.phone}</a>
-      </>
-    )}
-    {settings.fax && (
-      <>
-        <br />
-        Fax: {settings.fax}
-      </>
-    )}
-    {settings.email && (
-      <>
-        <br />
-        E-Mail: <a href={`mailto:${settings.email}`}>{settings.email}</a>
-      </>
-    )}
-    {settings.vat_id && (
-      <>
-        <br />
-        USt-IdNr.: {settings.vat_id}
-      </>
-    )}
-  </address>
+<footer class="site-footer">
+  <div class="frame grid">
+    <address class="company">
+      <strong class="company-name">{settings.company_name}</strong>
+      {settings.operators.length > 0 && (
+        <span>Inhaber: {settings.operators.join(", ")}</span>
+      )}
+      {street && <span>{street}</span>}
+      {place && <span>{place}</span>}
+      <span class="contact">
+        {settings.phone && (
+          <span>
+            Telefon: <a href={telHref(settings.phone)}>{settings.phone}</a>
+          </span>
+        )}
+        {settings.fax && <span>Fax: {settings.fax}</span>}
+        {settings.email && (
+          <span>
+            E-Mail: <a href={`mailto:${settings.email}`}>{settings.email}</a>
+          </span>
+        )}
+      </span>
+      {settings.vat_id && <span>USt-IdNr.: {settings.vat_id}</span>}
+    </address>
+
+    <nav class="sitemap" aria-label="Alle Seiten">
+      {MAIN_NAV.map((item) => (
+        <div class="sitemap-group">
+          <a class="sitemap-section" href={withBase(base, item.path)}>
+            {item.label}
+          </a>
+          {item.children && (
+            <ul>
+              {item.children.map((child) => (
+                <li>
+                  <a href={withBase(base, child.path)}>{child.label}</a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
+    </nav>
+
+    <div class="legal">
+      <nav aria-label="Rechtliches">
+        <ul>
+          {LEGAL_NAV.map((item) => (
+            <li>
+              <a href={withBase(base, item.path)}>{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <p>
+        © {year} {settings.company_name}
+      </p>
+    </div>
+  </div>
 </footer>
+
+<style>
+  .site-footer {
+    margin-block-start: var(--space-xl);
+    background: var(--color-fir-deep);
+    color: var(--on-band);
+    font-family: var(--font-ui);
+    font-size: var(--step--1);
+    line-height: 1.5;
+  }
+
+  .site-footer::before {
+    content: "";
+    display: block;
+    height: var(--rows-height);
+    background: var(--rows);
+  }
+
+  .site-footer > .grid {
+    padding-block: var(--space-l);
+  }
+
+  .site-footer a {
+    color: var(--on-band);
+  }
+
+  .site-footer a:hover {
+    color: var(--on-band-accent);
+  }
+
+  .company {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .company-name {
+    margin-block-end: var(--space-xs);
+    color: var(--on-band-accent);
+    font-family: var(--font-text);
+    font-size: var(--step-2);
+    font-weight: 750;
+    line-height: var(--leading-tight);
+  }
+
+  .contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    margin-block: var(--space-xs);
+  }
+
+  .sitemap {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: var(--space-m) var(--grid-gap);
+    align-content: start;
+  }
+
+  .sitemap-section {
+    display: block;
+    margin-block-end: var(--space-2xs);
+    font-size: var(--step-0);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .sitemap ul,
+  .legal ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sitemap li a {
+    display: inline-block;
+    padding-block: 0.15rem;
+    text-decoration: none;
+    color: color-mix(in srgb, var(--on-band) 82%, transparent);
+  }
+
+  .sitemap li a:hover {
+    text-decoration: underline;
+  }
+
+  .legal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-s);
+    padding-block-start: var(--space-m);
+    border-block-start: 1px solid
+      color-mix(in srgb, var(--on-band) 20%, transparent);
+  }
+
+  .legal ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-m);
+  }
+
+  .legal p {
+    margin: 0;
+  }
+
+  @media (min-width: 64rem) {
+    .company {
+      grid-column: 1 / span 4;
+    }
+
+    .sitemap {
+      grid-column: 6 / -1;
+    }
+  }
+</style>

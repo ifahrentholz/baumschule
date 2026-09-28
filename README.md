@@ -89,7 +89,7 @@ source, but not yet tried in a browser — the owner still needs to verify it
 by actually signing in once this branch is merged and deployed.
 
 **Settings** (`src/content/settings.json`) holds the company data: name,
-operators, address, phone, fax, e-mail, VAT ID, logo and brand colours.
+operators, address, phone, fax, e-mail, VAT ID and logo.
 Header and footer read it through `src/site-settings.ts`; blank fields are
 not rendered. Uploaded images are stored in `src/assets/images/` and
 optimised at build time.
@@ -97,6 +97,45 @@ optimised at build time.
 The company data was filled in from the content inventory of the live site
 (`.omnigent/runs/explore-site-inventory/report.md`); fax and e-mail were not
 stated there, so both stay blank until an editor adds them through the CMS.
-**The logo (`src/assets/images/logo.svg`) and `brand_colors` are still a
-placeholder**, not the company's real logo or brand colours — replace them
-through the CMS once the real assets are available (#4).
+The logo (`src/assets/images/logo.png`) is the live site's logo; editors
+can replace it through the CMS.
+
+## Design system and page tree
+
+- `src/styles/tokens.css`: colours, type scale, spacing and layout grid. The
+  four brand colours are the old site's (theme `bsf`). They are fixed (spec
+  D10) and live only in this file, not in the CMS.
+- `src/styles/global.css`: base typography and layout primitives (`.frame`,
+  `.grid`, `.measure`). Breakpoints: tablet `40rem`, desktop `64rem`.
+- Fonts (Alegreya, Alegreya Sans) come from `@fontsource` packages and are
+  bundled into the build.
+- `src/navigation.ts`: the information architecture: main navigation,
+  footer sitemap, legal links and breadcrumbs all read it. Every page below
+  the home page uses `src/layouts/PageShell.astro`.
+
+No page may load anything from a third-party origin (fonts, scripts, images,
+maps, embeds), and the site sets no cookies (AC-7). Add assets to the repo
+instead of linking them. `scripts/verify-dist.ts` enforces this on every
+build: it fails on any third-party URL a public page loads (`src`,
+`srcset`, stylesheet/preload/icon/manifest/preconnect `<link>`s, CSS
+`url()`/`@import`, script `fetch`/`import`, `<iframe>`) and on cookie writes
+in their scripts. Plain outbound links (`<a href>`) are allowed. `/admin`
+is exempt.
+
+### Manual check: responsive design (AC-6)
+
+Not covered by an automated test. Check it on the preview after each design
+change, in a desktop browser's responsive mode:
+
+- [ ] At widths 360, 768 and 1280 px, the home page and one sub-page (e.g.
+      `/sortiment/`) show no horizontal scrollbar and no content cut off at
+      the right edge.
+- [ ] Below 1024 px (`64rem`) the main navigation folds behind the "Menü"
+      button; from 1024 px up it is shown in full in the header.
+- [ ] The logo is shown in the header, and the brand colours (Tannengrün
+      band, Fischer-Grün/Moosgrün accents, Claim-Gelb on the home page
+      title) are present.
+- [ ] Keyboard only, at 360 px: Tab reaches the "Menü" button, Enter or
+      Space opens the navigation, Tab moves through its links, Escape
+      closes it and returns focus to the button, and the button's focus
+      outline is visible.

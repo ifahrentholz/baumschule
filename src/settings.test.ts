@@ -10,7 +10,6 @@ const COMPLETE = {
   email: "info@example.com",
   vat_id: "DE123456789",
   logo: "/src/assets/images/logo.svg",
-  brand_colors: [{ name: "Green", value: "#2f6b2f" }],
 };
 
 describe("parseSettings", () => {
@@ -28,14 +27,12 @@ describe("parseSettings", () => {
       email: "",
       vat_id: "",
       logo: "/src/assets/images/logo.svg",
-      brand_colors: [],
     });
     expect(settings).toEqual({
       company_name: "Baumschule Fischer",
       operators: ["Anna Fischer"],
       address: {},
       logo: "/src/assets/images/logo.svg",
-      brand_colors: [],
     });
   });
 
@@ -50,7 +47,6 @@ describe("parseSettings", () => {
       operators: [],
       address: {},
       logo: "/src/assets/images/logo.svg",
-      brand_colors: [],
     });
   });
 
@@ -76,9 +72,6 @@ describe("parseSettings", () => {
     expect(() => parseSettings({ ...COMPLETE, operators: "Anna" })).toThrow(
       /operators/,
     );
-    expect(() =>
-      parseSettings({ ...COMPLETE, brand_colors: [{ name: "Green" }] }),
-    ).toThrow(/brand_colors\[0\]\.value/);
   });
 });
 

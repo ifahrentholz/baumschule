@@ -14,12 +14,6 @@ export interface Address {
   city?: string;
 }
 
-export interface BrandColor {
-  name: string;
-  /** CSS colour value, e.g. `#2f6b2f`. */
-  value: string;
-}
-
 export interface Settings {
   company_name: string;
   operators: string[];
@@ -30,7 +24,6 @@ export interface Settings {
   vat_id?: string;
   /** Repository path of the logo, e.g. `/src/assets/images/logo.svg`. */
   logo: string;
-  brand_colors: BrandColor[];
 }
 
 type Data = Record<string, unknown>;
@@ -49,13 +42,6 @@ export function parseSettings(raw: unknown): Settings {
       city: text(address.city, "address.city"),
     }),
     logo: required(data, "logo"),
-    brand_colors: list(data.brand_colors, "brand_colors").map((color, i) => {
-      const entry = record(color, `brand_colors[${i}]`);
-      return {
-        name: required(entry, "name", `brand_colors[${i}].name`),
-        value: required(entry, "value", `brand_colors[${i}].value`),
-      };
-    }),
   };
   const optional = withoutBlanks({
     phone: text(data.phone, "phone"),
