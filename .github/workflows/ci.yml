@@ -40,7 +40,8 @@ jobs:
 
       # AC-10: every preview page carries the noindex meta (the only indexing
       # protection in phase 1), robots.txt does not block crawling, and every
-      # internal link/asset URL sits below the base path.
+      # internal link/asset URL sits below the base path. AC-7: no public page
+      # loads anything from a third-party origin or sets a cookie.
       - name: Verify dist (preview)
         run: node scripts/verify-dist.ts
 

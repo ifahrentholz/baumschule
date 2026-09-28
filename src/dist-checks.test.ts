@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   findInternalUrls,
+  findThirdPartyRequests,
   hasNoindexMeta,
   isCheckedFile,
   isOutsideBase,
   robotsTxtDisallowsAll,
+  setsCookie,
   verifyDist,
 } from "./dist-checks";
 
@@ -158,6 +160,170 @@ describe("findInternalUrls", () => {
 
   it("throws on a web app manifest that is not valid JSON", () => {
     expect(() => urls("site.webmanifest", "{")).toThrow(/JSON/);
+  });
+});
+
+describe("findThirdPartyRequests", () => {
+  function requests(path: string, content: string, target = PHASE_2) {
+    return findThirdPartyRequests({ path, content }, target);
+  }
+
+  it("finds foreign src, srcset and poster URLs on any element", () => {
+    const html = `<img src="https://cdn.example.com/a.png">
+      <source srcset="https://cdn.example.com/b.png 1x, /own.png 2x">
+      <video poster='//media.example.com/p.jpg'></video>
+      <script src=https://js.example.com/s.js></script>
+      <iframe src="https://www.youtube.com/embed/x"></iframe>`;
+    expect(requests("index.html", html)).toEqual([
+      "https://cdn.example.com/a.png",
+      "https://cdn.example.com/b.png",
+      "https://media.example.com/p.jpg",
+      "https://js.example.com/s.js",
+      "https://www.youtube.com/embed/x",
+    ]);
+  });
+
+  it("finds foreign stylesheets, preloads, icons, manifests, preconnect and dns-prefetch", () => {
+    const html = `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=A">
+      <link rel="preload" as="font" href="https://fonts.gstatic.com/a.woff2">
+      <link rel="modulepreload" href="https://esm.sh/x.js">
+      <link rel="icon" href="https://cdn.example.com/favicon.ico">
+      <link rel="manifest" href="https://cdn.example.com/site.webmanifest">
+      <link rel="preconnect" href="https://fonts.gstatic.com">
+      <link rel="dns-prefetch" href="//maps.example.com">
+      <link rel="preload" imagesrcset="https://cdn.example.com/h.png 2x">`;
+    expect(requests("index.html", html)).toEqual([
+      "https://fonts.googleapis.com/css2?family=A",
+      "https://fonts.gstatic.com/a.woff2",
+      "https://esm.sh/x.js",
+      "https://cdn.example.com/favicon.ico",
+      "https://cdn.example.com/site.webmanifest",
+      "https://fonts.gstatic.com/",
+      "https://maps.example.com/",
+      "https://cdn.example.com/h.png",
+    ]);
+  });
+
+  it("allows outbound links a visitor follows: <a>, <area>, forms and relational <link>s", () => {
+    const html = `<a href="https://www.gartenmedien.com/katalog">Katalog</a>
+      <area href="https://example.com/map">
+      <form action="https://example.com/send"></form>
+      <link rel="canonical" href="https://example.com/">
+      <link rel="alternate" hreflang="en" href="https://example.com/en/">`;
+    expect(requests("index.html", html)).toEqual([]);
+  });
+
+  it("finds SVG <image> and <use> hrefs", () => {
+    const html = `<svg><image href="https://cdn.example.com/i.png"/>
+      <use xlink:href="https://cdn.example.com/sprite.svg#a"/></svg>`;
+    expect(requests("index.html", html)).toEqual([
+      "https://cdn.example.com/i.png",
+      "https://cdn.example.com/sprite.svg#a",
+    ]);
+  });
+
+  it("finds CSS url() and @import on foreign origins, in stylesheets, <style> and style attributes", () => {
+    const css = `@import "https://fonts.googleapis.com/css";a{background:url(//cdn.example.com/x.png)}b{background:url(/own.png)}`;
+    expect(requests("_astro/site.css", css)).toEqual([
+      "https://fonts.googleapis.com/css",
+      "https://cdn.example.com/x.png",
+    ]);
+    const html = `<style>@import url('https://fonts.googleapis.com/a');</style>
+      <div style="background: url(&quot;https://cdn.example.com/y.png&quot;)"></div>`;
+    expect(requests("index.html", html)).toEqual([
+      "https://fonts.googleapis.com/a",
+      "https://cdn.example.com/y.png",
+    ]);
+  });
+
+  it("finds requests in inline and external scripts: fetch, import, XHR, sockets, beacons, src assignments", () => {
+    const js = `fetch("https://api.example.com/a");import("https://esm.sh/b.js");
+      import x from "https://esm.sh/c.js";xhr.open("GET",'https://api.example.com/d');
+      new WebSocket("wss://ws.example.com/e");navigator.sendBeacon(\`https://t.example.com/f\`);
+      img.src="https://px.example.com/g.gif";el.setAttribute("src","https://cdn.example.com/h.js")`;
+    const expected = [
+      "https://api.example.com/a",
+      "https://esm.sh/b.js",
+      "https://esm.sh/c.js",
+      "https://api.example.com/d",
+      "wss://ws.example.com/e",
+      "https://t.example.com/f",
+      "https://px.example.com/g.gif",
+      "https://cdn.example.com/h.js",
+    ];
+    expect(requests("_astro/page.js", js).sort()).toEqual([...expected].sort());
+    expect(requests("index.html", `<script>${js}</script>`).sort()).toEqual(
+      [...expected].sort(),
+    );
+  });
+
+  it("ignores URLs in scripts that are not requests: navigation, namespaces, JSON-LD", () => {
+    const js = `location.href="https://www.gartenmedien.com/";window.open("https://example.com/");
+      document.createElementNS("http://www.w3.org/2000/svg","svg")`;
+    expect(requests("_astro/page.js", js)).toEqual([]);
+    const html = `<script type="application/ld+json">{"sameAs":"https://www.facebook.com/x","image":"https://cdn.example.com/a.png"}</script>`;
+    expect(requests("index.html", html)).toEqual([]);
+  });
+
+  it("treats the site's own origin, with or without www., relative URLs and data: URLs as local", () => {
+    const html = `<img src="https://www.baumschule-fischer.de/a.png">
+      <img src="https://baumschule-fischer.de/b.png"><img src="/c.png"><img src="d.png">
+      <img src="data:image/png;base64,AAAA">`;
+    expect(requests("index.html", html)).toEqual([]);
+  });
+
+  it("finds foreign icon src in a web app manifest, but not its start_url", () => {
+    const manifest = `{"start_url":"https://example.com/","icons":[{"src":"https://cdn.example.com/i.png"}]}`;
+    expect(requests("site.webmanifest", manifest)).toEqual([
+      "https://cdn.example.com/i.png",
+    ]);
+  });
+});
+
+describe("setsCookie", () => {
+  it("detects cookie writes in scripts and a set-cookie meta", () => {
+    expect(
+      setsCookie({ path: "_astro/a.js", content: 'document.cookie="a=1"' }),
+    ).toBe(true);
+    expect(
+      setsCookie({ path: "_astro/a.js", content: "document['cookie'] = x" }),
+    ).toBe(true);
+    expect(
+      setsCookie({ path: "_astro/a.js", content: 'cookieStore.set("a","1")' }),
+    ).toBe(true);
+    expect(
+      setsCookie({
+        path: "index.html",
+        content: "<script>document.cookie = 'a=1';</script>",
+      }),
+    ).toBe(true);
+    expect(
+      setsCookie({
+        path: "index.html",
+        content: '<meta http-equiv="Set-Cookie" content="a=1">',
+      }),
+    ).toBe(true);
+  });
+
+  it("ignores reading or comparing cookies, and text that only mentions them", () => {
+    expect(
+      setsCookie({
+        path: "_astro/a.js",
+        content: "const c = document.cookie;",
+      }),
+    ).toBe(false);
+    expect(
+      setsCookie({
+        path: "_astro/a.js",
+        content: 'if (document.cookie == "") {}',
+      }),
+    ).toBe(false);
+    expect(
+      setsCookie({
+        path: "index.html",
+        content: "<p>Wir setzen keine Cookies. document.cookie = x</p>",
+      }),
+    ).toBe(false);
   });
 });
 
@@ -347,6 +513,68 @@ describe("verifyDist", () => {
       "robots.txt missing",
       "no internal URL found in any checked file: the base-path check had nothing to check",
     ]);
+  });
+
+  describe("AC-7: third-party requests and cookies on public pages", () => {
+    it("reports each third-party request and cookie write, naming the file", () => {
+      const files = [
+        {
+          path: "index.html",
+          content:
+            livePage +
+            `<link rel="preconnect" href="https://fonts.gstatic.com">
+            <iframe src="https://www.google.com/maps/embed?pb=x"></iframe>
+            <script type="module" src="/_astro/page.js"></script>`,
+        },
+        {
+          path: "_astro/page.js",
+          content:
+            'fetch("https://api.example.com/x");document.cookie="seen=1"',
+        },
+        {
+          path: "_astro/site.css",
+          content: "@import url(https://fonts.googleapis.com/css);",
+        },
+        { path: "robots.txt", content: robots },
+      ];
+      expect(verifyDist(files, PHASE_2, "index")).toEqual([
+        "index.html: loads from a third-party origin: https://fonts.gstatic.com/",
+        "index.html: loads from a third-party origin: https://www.google.com/maps/embed?pb=x",
+        "_astro/page.js: loads from a third-party origin: https://api.example.com/x",
+        "_astro/page.js: sets a cookie",
+        "_astro/site.css: loads from a third-party origin: https://fonts.googleapis.com/css",
+      ]);
+    });
+
+    it("allows outbound <a href> links, such as the catalogue", () => {
+      const files = [
+        {
+          path: "katalog/index.html",
+          content:
+            livePage +
+            `<a href="https://www.gartenmedien.com/katalog" rel="external">Katalog</a>`,
+        },
+        { path: "robots.txt", content: robots },
+      ];
+      expect(verifyDist(files, PHASE_2, "index")).toEqual([]);
+    });
+
+    it("exempts the admin page and the scripts only it loads", () => {
+      const files = [
+        { path: "index.html", content: livePage },
+        {
+          path: "admin/index.html",
+          content: `<meta name="robots" content="noindex"><link rel="preconnect" href="https://api.github.com">
+            <script type="module" src="/_astro/admin.js"></script>`,
+        },
+        {
+          path: "_astro/admin.js",
+          content: 'fetch("https://api.github.com/user");document.cookie="x=1"',
+        },
+        { path: "robots.txt", content: robots },
+      ];
+      expect(verifyDist(files, PHASE_2, "index")).toEqual([]);
+    });
   });
 
   describe("the CMS admin page", () => {

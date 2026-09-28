@@ -1,6 +1,7 @@
 /**
  * Pure checks over the built site in `dist/`, used by `scripts/verify-dist.ts`
- * in CI (AC-10: base path and noindex).
+ * in CI (AC-10: base path and noindex; AC-7: no third-party requests and no
+ * cookies on the public pages).
  */
 import type { DeployTarget } from "./deploy-target";
 import type { Indexing } from "./indexing";
@@ -40,6 +41,64 @@ const SCHEME = /^[a-z][a-z0-9+.-]*:/i;
 // `new URL(..., import.meta.url)` (workers, wasm).
 const RELATIVE_SPECIFIER =
   /(?:\bfrom\s*|\bimport\s*\(?\s*|\bnew\s+URL\s*\(\s*)(["'`])(\.{1,2}\/[^"'`\s\\]+)\1/g;
+
+// AC-7: what a page loads by itself, as opposed to links a visitor follows.
+// Any element's `src`/`srcset`/`poster` is fetched; `href` is only fetched on
+// these elements (not on `<a>`/`<area>`, which are navigation).
+const HTML_TAG = /<([a-z][\w:-]*)\b((?:[^>"']|"[^"]*"|'[^']*')*)>/gi;
+const LOADING_ATTRIBUTES = new Set([
+  "src",
+  "srcset",
+  "imagesrcset",
+  "poster",
+  "background",
+]);
+const HREF_LOADING_ELEMENTS = new Set(["link", "image", "use", "feimage"]);
+// `<link rel>` values that only describe a relation and fetch nothing; every
+// other rel (stylesheet, preload, icon, manifest, preconnect, ...) counts.
+const NAVIGATION_RELS = new Set([
+  "alternate",
+  "author",
+  "bookmark",
+  "canonical",
+  "external",
+  "help",
+  "license",
+  "me",
+  "next",
+  "nofollow",
+  "noopener",
+  "noreferrer",
+  "prev",
+  "tag",
+]);
+const INLINE_STYLE = /<style\b[^>]*>([\s\S]*?)<\/style\s*>/gi;
+// Script types the browser does not execute (data blocks).
+const DATA_SCRIPT_TYPES = new Set(["application/ld+json", "application/json"]);
+// An absolute or protocol-relative URL in a JS string literal.
+const JS_ABSOLUTE = String.raw`(?:(?:https?|wss?):)?\/\/[^"'\`\s\\]+`;
+// JS that requests a URL: fetch/import/workers/sockets/beacons, static
+// imports, XHR `open(method, url)`, and assigning `src` or `srcset`.
+const JS_REQUESTS = [
+  new RegExp(
+    String.raw`\b(?:fetch|import|importScripts|sendBeacon|WebSocket|EventSource|Worker|SharedWorker|Request|Audio)\s*\(\s*(["'\`])(${JS_ABSOLUTE})\1`,
+    "g",
+  ),
+  new RegExp(String.raw`\b(?:from|import)\s*(["'\`])(${JS_ABSOLUTE})\1`, "g"),
+  new RegExp(
+    String.raw`\.open\s*\(\s*["'\`][A-Za-z]+["'\`]\s*,\s*(["'\`])(${JS_ABSOLUTE})\1`,
+    "g",
+  ),
+  new RegExp(
+    String.raw`(?:\.(?:src|srcset)\s*=|\bsetAttribute\s*\(\s*["'\`](?:src|srcset)["'\`]\s*,)\s*(["'\`])(${JS_ABSOLUTE})\1`,
+    "g",
+  ),
+];
+const COOKIE_WRITES = [
+  /\bdocument\s*\.\s*cookie\s*=(?!=)/,
+  /\bdocument\s*\[\s*(["'`])cookie\1\s*\]\s*=(?!=)/,
+  /\bcookieStore\s*\.\s*set\s*\(/,
+];
 
 /** The Sveltia CMS editing UI lives below this dist/ folder (`/admin`). */
 const ADMIN_DIR = "admin/";
@@ -154,6 +213,24 @@ export function verifyDist(
       }
     }
 
+    // AC-7 applies to the public site; the editing UI is exempt (open
+    // question), and so is every script only it loads.
+    if (!isAdminPage(file.path) && !cmsScripts.has(file.path)) {
+      let requests: string[];
+      try {
+        requests = findThirdPartyRequests(file, target);
+      } catch {
+        // Unreadable files are reported by the base-path check below.
+        requests = [];
+      }
+      for (const url of requests) {
+        problems.push(`${file.path}: loads from a third-party origin: ${url}`);
+      }
+      if (setsCookie(file)) {
+        problems.push(`${file.path}: sets a cookie`);
+      }
+    }
+
     // The CMS bundle is third-party code full of GitHub API paths ("/user",
     // "/repos/...") that the JS string heuristic would take for site URLs.
     // The admin page itself, and every script a site page loads, is checked.
@@ -193,6 +270,75 @@ export function verifyDist(
     );
   }
   return problems;
+}
+
+/**
+ * Returns every URL on a foreign origin that a built file makes the browser
+ * request by itself, in document order (AC-7). In HTML that is any element's
+ * `src`/`srcset`/`poster`, the `href` of `<link>` (except purely relational
+ * rels like `canonical`) and of SVG `<image>`/`<use>`, CSS `url()`/`@import`
+ * in `<style>` and `style=""`, and requests made by inline scripts. In CSS,
+ * `url()`/`@import`; in JS, fetch/import/worker/socket/beacon/XHR URLs and
+ * `src` assignments; in a web app manifest, icon `src`s. Links a visitor
+ * follows (`<a href>`, form actions, redirects) are not requests.
+ *
+ * Throws if a web app manifest is not valid JSON.
+ */
+export function findThirdPartyRequests(
+  file: DistFile,
+  target: DeployTarget,
+): string[] {
+  const kind = kindOf(file.path);
+  let found: Candidate[];
+  switch (kind) {
+    case "html":
+      found = [
+        ...loadingAttributeUrls(file.content),
+        ...inlineStyleUrls(file.content),
+        ...inlineScripts(file.content).flatMap(({ index, body }) =>
+          jsRequestUrls(body).map((url) => ({
+            ...url,
+            index: index + url.index,
+          })),
+        ),
+      ];
+      break;
+    case "css":
+      found = cssUrls(file.content, false);
+      break;
+    case "js":
+      found = jsRequestUrls(file.content);
+      break;
+    case "manifest":
+      found = manifestUrls(file.content, new Set(["src"]));
+      break;
+    default:
+      return [];
+  }
+  const documentUrl = documentUrlOf(file.path, target);
+  const hosts = ownHosts(target.site);
+  return found
+    .sort((a, b) => a.index - b.index)
+    .map(({ value }) => foreignUrl(value.trim(), documentUrl, hosts))
+    .filter((url): url is string => url !== null);
+}
+
+/**
+ * True if a built file's scripts set a cookie (`document.cookie = ...`,
+ * `cookieStore.set(...)`), or an HTML page sets one through
+ * `<meta http-equiv="set-cookie">` (AC-7).
+ */
+export function setsCookie(file: DistFile): boolean {
+  const kind = kindOf(file.path);
+  const writesCookie = (js: string) =>
+    COOKIE_WRITES.some((pattern) => pattern.test(js));
+  if (kind === "js") return writesCookie(file.content);
+  if (kind !== "html") return false;
+  for (const [tag] of file.content.matchAll(/<meta\b[^>]*>/gi)) {
+    const httpEquiv = readAttributes(tag).get("http-equiv")?.toLowerCase();
+    if (httpEquiv === "set-cookie") return true;
+  }
+  return inlineScripts(file.content).some(({ body }) => writesCookie(body));
 }
 
 /** True for an HTML page of the CMS editing UI. */
@@ -326,6 +472,100 @@ function toInternalPath(
 function ownHosts(site: string): Set<string> {
   const bare = new URL(site).host.replace(/^www\./i, "");
   return new Set([bare, `www.${bare}`]);
+}
+
+/** The absolute URL, if it is http(s) or ws(s) on a host other than the site's. */
+function foreignUrl(
+  url: string,
+  documentUrl: URL,
+  hosts: Set<string>,
+): string | null {
+  // Only absolute and protocol-relative URLs can leave the site.
+  if (!url.startsWith("//") && !SCHEME.test(url)) return null;
+  let parsed: URL;
+  try {
+    parsed = new URL(url, documentUrl);
+  } catch {
+    return null;
+  }
+  if (!["http:", "https:", "ws:", "wss:"].includes(parsed.protocol)) {
+    return null;
+  }
+  return hosts.has(parsed.host) ? null : parsed.href;
+}
+
+/** URLs the browser fetches for an HTML element's own attributes. */
+function loadingAttributeUrls(html: string): Candidate[] {
+  const found: Candidate[] = [];
+  for (const match of html.matchAll(HTML_TAG)) {
+    const element = match[1]!.toLowerCase();
+    const attributes = readAttributes(match[0]);
+    const push = (name: string) => {
+      const value = decodeEntities(attributes.get(name) ?? "");
+      const values = SRCSET_ATTRIBUTE.test(name) ? splitSrcset(value) : [value];
+      for (const url of values) found.push({ index: match.index, value: url });
+    };
+    for (const name of attributes.keys()) {
+      if (LOADING_ATTRIBUTES.has(name)) push(name);
+    }
+    if (element === "object" && attributes.has("data")) push("data");
+    if (HREF_LOADING_ELEMENTS.has(element)) {
+      const rels = (attributes.get("rel") ?? "")
+        .toLowerCase()
+        .split(/\s+/)
+        .filter((rel) => rel !== "");
+      const onlyRelational =
+        element === "link" &&
+        rels.length > 0 &&
+        rels.every((rel) => NAVIGATION_RELS.has(rel));
+      if (!onlyRelational) {
+        if (attributes.has("href")) push("href");
+        if (attributes.has("xlink:href")) push("xlink:href");
+      }
+    }
+    const style = attributes.get("style");
+    if (style !== undefined) {
+      for (const url of cssUrls(decodeEntities(style), false)) {
+        found.push({ index: match.index, value: url.value });
+      }
+    }
+  }
+  return found;
+}
+
+function inlineStyleUrls(html: string): Candidate[] {
+  const found: Candidate[] = [];
+  for (const match of html.matchAll(INLINE_STYLE)) {
+    const bodyIndex = match.index + match[0].indexOf(">") + 1;
+    for (const url of cssUrls(match[1]!, false)) {
+      found.push({ index: bodyIndex + url.index, value: url.value });
+    }
+  }
+  return found;
+}
+
+/** The bodies of the inline `<script>` blocks the browser executes. */
+function inlineScripts(html: string): { index: number; body: string }[] {
+  const scripts: { index: number; body: string }[] = [];
+  for (const match of html.matchAll(INLINE_SCRIPT)) {
+    const attributes = readAttributes(`<script${match[1]}>`);
+    const type = attributes.get("type")?.trim().toLowerCase() ?? "";
+    if (DATA_SCRIPT_TYPES.has(type)) continue;
+    scripts.push({
+      index: match.index + match[0].indexOf(">") + 1,
+      body: match[2]!,
+    });
+  }
+  return scripts;
+}
+
+function jsRequestUrls(js: string): Candidate[] {
+  return JS_REQUESTS.flatMap((pattern) =>
+    [...js.matchAll(pattern)].map((match) => ({
+      index: match.index,
+      value: match[2]!,
+    })),
+  );
 }
 
 function attributeUrls(text: string): Candidate[] {
@@ -471,7 +711,7 @@ function jsUrls(js: string): Candidate[] {
   }));
 }
 
-function manifestUrls(json: string): Candidate[] {
+function manifestUrls(json: string, keys = MANIFEST_URL_KEYS): Candidate[] {
   let manifest: unknown;
   try {
     manifest = JSON.parse(json);
@@ -483,7 +723,7 @@ function manifestUrls(json: string): Candidate[] {
   const found: Candidate[] = [];
   const walk = (node: unknown, key?: string): void => {
     if (typeof node === "string") {
-      if (key !== undefined && MANIFEST_URL_KEYS.has(key)) {
+      if (key !== undefined && keys.has(key)) {
         found.push({ index: found.length, value: node });
       }
     } else if (Array.isArray(node)) {
