@@ -1,0 +1,3 @@
+Fixture placeholder for the case-insensitive image glob test in
+site-settings.test.ts. Not a real photo; the content is never decoded, only
+the file's existence and its upper-case extension matter for that test.

@@ -61,3 +61,42 @@ environment. It fails if:
   `www.`) are included.
 
 CI also builds and checks the phase 2 variant.
+
+The CMS editing UI below `admin/` is handled on purpose: its page must carry
+the noindex meta in both phases, and the scripts only it loads (the bundled
+Sveltia CMS, whose GitHub API paths like `"/user"` look like site URLs to the
+JS check) are skipped by the base-path check. The admin page itself, and any
+script a site page loads, is still checked.
+
+## Content editing (Sveltia CMS)
+
+Content is edited with [Sveltia CMS](https://sveltiacms.app/) at `/admin/`
+(phase 1: `https://ifahrentholz.de/baumschule/admin/`). The CMS is installed
+from npm and bundled into the build, so no script is loaded from a CDN. Its
+configuration lives in `src/cms-config.ts` and is passed to `CMS.init()` in
+full; there is no `config.yml`.
+
+Saving in the CMS commits straight to `main`, which triggers the deploy above.
+
+**Signing in (phase 1).** Each editor needs a GitHub account with write
+access to this repository. On the CMS login screen choose "Sign In with
+Token" and paste a GitHub personal access token: a fine-grained token for
+`ifahrentholz/baumschule` with the repository permission _Contents: Read and
+write_ (or a classic token with the `repo` scope). The token is kept in the
+browser's local storage. Phase 2 adds GitHub sign-in through an OAuth helper.
+This is **assumption A1** (spec §8): confirmed against Sveltia's docs and
+source, but not yet tried in a browser — the owner still needs to verify it
+by actually signing in once this branch is merged and deployed.
+
+**Settings** (`src/content/settings.json`) holds the company data: name,
+operators, address, phone, fax, e-mail, VAT ID, logo and brand colours.
+Header and footer read it through `src/site-settings.ts`; blank fields are
+not rendered. Uploaded images are stored in `src/assets/images/` and
+optimised at build time.
+
+The company data was filled in from the content inventory of the live site
+(`.omnigent/runs/explore-site-inventory/report.md`); fax and e-mail were not
+stated there, so both stay blank until an editor adds them through the CMS.
+**The logo (`src/assets/images/logo.svg`) and `brand_colors` are still a
+placeholder**, not the company's real logo or brand colours — replace them
+through the CMS once the real assets are available (#4).

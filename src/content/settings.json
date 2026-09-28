@@ -1,0 +1,15 @@
+{
+  "company_name": "Baumschule Fischer",
+  "operators": ["Felix Fischer", "Katrin Fischer"],
+  "address": {
+    "street": "Lettberger Str. 95",
+    "postal_code": "12355",
+    "city": "Berlin"
+  },
+  "phone": "+49 30 6635041",
+  "fax": "",
+  "email": "",
+  "vat_id": "DE 135829629",
+  "logo": "/src/assets/images/logo.svg",
+  "brand_colors": []
+}

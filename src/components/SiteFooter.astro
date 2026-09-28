@@ -1,0 +1,58 @@
+---
+// Minimal footer with the company data from the Settings singleton; styled in
+// the design system ticket (#4). Blank fields are left out.
+import { loadSiteSettings } from "../site-settings";
+import { telHref } from "../settings";
+
+const settings = loadSiteSettings();
+const { street, postal_code, city } = settings.address;
+const place = [postal_code, city].filter(Boolean).join(" ");
+---
+
+<footer>
+  <address>
+    <strong>{settings.company_name}</strong>
+    {settings.operators.length > 0 && (
+      <>
+        <br />
+        Inhaber: {settings.operators.join(", ")}
+      </>
+    )}
+    {street && (
+      <>
+        <br />
+        {street}
+      </>
+    )}
+    {place && (
+      <>
+        <br />
+        {place}
+      </>
+    )}
+    {settings.phone && (
+      <>
+        <br />
+        Telefon: <a href={telHref(settings.phone)}>{settings.phone}</a>
+      </>
+    )}
+    {settings.fax && (
+      <>
+        <br />
+        Fax: {settings.fax}
+      </>
+    )}
+    {settings.email && (
+      <>
+        <br />
+        E-Mail: <a href={`mailto:${settings.email}`}>{settings.email}</a>
+      </>
+    )}
+    {settings.vat_id && (
+      <>
+        <br />
+        USt-IdNr.: {settings.vat_id}
+      </>
+    )}
+  </address>
+</footer>
