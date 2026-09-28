@@ -4,3 +4,6 @@ node_modules/
 package-lock.json
 docs/specs/
 .omnigent/
+# Written by Sveltia CMS in its own JSON layout; checking it would fail CI on
+# every CMS save and block the deploy.
+src/content/settings.json

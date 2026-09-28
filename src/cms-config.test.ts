@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import type { CollectionFile, Field } from "@sveltia/cms";
+import { getFileInfo } from "prettier";
 import { describe, expect, it } from "vitest";
 import { IMAGE_FOLDER, SETTINGS_FILE, createCmsConfig } from "./cms-config";
 import { parseSettings } from "./settings";
@@ -72,6 +73,18 @@ describe("createCmsConfig", () => {
       "logo",
       "brand_colors",
     ]);
+  });
+});
+
+describe("the files the CMS writes", () => {
+  // Sveltia serialises JSON its own way (one array item per line), which
+  // Prettier would reformat. A format check on these files fails CI on every
+  // CMS save and so blocks the deploy.
+  it("are left out of the format check, so a CMS save cannot fail CI", async () => {
+    const { ignored } = await getFileInfo(settingsSingleton().file, {
+      ignorePath: ".prettierignore",
+    });
+    expect(ignored).toBe(true);
   });
 });
 
