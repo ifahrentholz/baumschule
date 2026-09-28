@@ -37,3 +37,56 @@ jobs:
         run: |
           test -f dist/index.html || { echo "dist/index.html missing"; exit 1; }
           if [ -d dist/server ]; then echo "dist/server exists: build is not static"; exit 1; fi
+
+      # AC-10: every preview page carries the noindex meta (the only indexing
+      # protection in phase 1), robots.txt does not block crawling, and every
+      # internal link/asset URL sits below the base path.
+      - name: Verify dist (preview)
+        run: node scripts/verify-dist.ts
+
+      - name: Upload Pages artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  # Phase 2 guard: the same code built for the live site must drop noindex
+  # and must not ship `Disallow: /`.
+  production-build:
+    runs-on: ubuntu-latest
+    env:
+      SITE_URL: https://www.baumschule-fischer.de
+      BASE_PATH: /
+      SITE_INDEXING: index
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify dist (production)
+        run: node scripts/verify-dist.ts
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build, production-build]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
