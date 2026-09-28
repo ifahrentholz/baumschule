@@ -2,7 +2,8 @@
  * Resolves Astro's `site` and `base` from the environment, so the same code
  * builds for phase 1 (GitHub Pages, `/baumschule`) and phase 2 (All-Inkl, `/`).
  *
- * - `SITE_URL`  absolute origin the site is served from
+ * - `SITE_URL`  absolute origin the site is served from (no path — the
+ *                path belongs in `BASE_PATH`, or it would appear twice)
  * - `BASE_PATH` path prefix below that origin
  *
  * Unset or empty values fall back to the phase 1 target.
@@ -35,7 +36,12 @@ function validateSite(site: string): string {
   if (url.protocol !== "http:" && url.protocol !== "https:") {
     throw new Error(`SITE_URL must be an absolute http(s) URL, got "${site}"`);
   }
-  return site;
+  if (url.pathname !== "/" || url.search !== "" || url.hash !== "") {
+    throw new Error(
+      `SITE_URL must be an origin without path, query or fragment (put the path in BASE_PATH), got "${site}"`,
+    );
+  }
+  return url.origin;
 }
 
 function normaliseBase(base: string): string {
