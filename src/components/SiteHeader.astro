@@ -1,16 +1,235 @@
 ---
-// Minimal header fed by the Settings singleton; styled in the design system
-// ticket (#4).
+// Site header: the brand logo (from the Settings singleton) on its own
+// Tannengrün and the main navigation. Below the desktop breakpoint the
+// navigation folds behind a menu button; without JavaScript it stays open.
 import { Image } from "astro:assets";
+import { currentState, MAIN_NAV, withBase } from "../navigation";
 import { loadSiteSettings } from "../site-settings";
 
+interface Props {
+  /** Current page as a site path without the base path. */
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
 const settings = loadSiteSettings();
-const home = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL;
+const home = withBase(base, "/");
 ---
 
-<header>
-  <a href={home}>
-    <Image src={settings.logoImage} alt="" height={48} loading="eager" />
-    <span>{settings.company_name}</span>
-  </a>
+<header class="site-header">
+  <div class="bar frame">
+    <a class="brand" href={home}>
+      <Image
+        src={settings.logoImage}
+        alt={`${settings.company_name} – Startseite`}
+        height={60}
+        densities={[1, 1.5]}
+        loading="eager"
+        fetchpriority="high"
+      />
+    </a>
+    <button
+      class="nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="hauptnavigation"
+    >
+      <span class="nav-toggle-icon" aria-hidden="true"></span>
+      Menü
+    </button>
+    <nav id="hauptnavigation" class="site-nav" aria-label="Hauptnavigation">
+      <ul>
+        {MAIN_NAV.map((item) => {
+          const state = currentState(currentPath, item.path);
+          return (
+            <li>
+              <a
+                href={withBase(base, item.path)}
+                aria-current={state === "page" ? "page" : undefined}
+                data-section={state === "section" ? "" : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  </div>
 </header>
+
+<script>
+  const header = document.querySelector<HTMLElement>(".site-header");
+  const toggle = header?.querySelector<HTMLButtonElement>(".nav-toggle");
+  if (header && toggle) {
+    header.dataset.enhanced = "";
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute("aria-expanded", String(open));
+      header.toggleAttribute("data-open", open);
+    };
+    toggle.addEventListener("click", () => {
+      setOpen(toggle.getAttribute("aria-expanded") !== "true");
+    });
+    header.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && header.hasAttribute("data-open")) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+</script>
+
+<style>
+  .site-header {
+    background: var(--band);
+    color: var(--on-band);
+    font-family: var(--font-ui);
+  }
+
+  /* Planting rows along the bottom edge of the band */
+  .site-header::after {
+    content: "";
+    display: block;
+    height: var(--rows-height);
+    background: var(--rows);
+  }
+
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs) var(--space-m);
+    padding-block: var(--space-xs);
+  }
+
+  .brand {
+    display: block;
+    flex: none;
+    /* The logo artwork carries its own Tannengrün background */
+    margin-inline-start: -0.5rem;
+  }
+
+  .brand img {
+    height: 3.25rem;
+    width: auto;
+  }
+
+  .nav-toggle {
+    display: none;
+    align-items: center;
+    gap: var(--space-xs);
+    min-height: 2.75rem;
+    padding: 0 var(--space-s);
+    border: 1px solid color-mix(in srgb, var(--on-band) 45%, transparent);
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--on-band);
+    font: 500 var(--step-0) / 1 var(--font-ui);
+    cursor: pointer;
+  }
+
+  .nav-toggle-icon,
+  .nav-toggle-icon::before,
+  .nav-toggle-icon::after {
+    display: block;
+    width: 1.1rem;
+    height: 2px;
+    background: currentColor;
+  }
+
+  .nav-toggle-icon {
+    position: relative;
+  }
+
+  .nav-toggle-icon::before,
+  .nav-toggle-icon::after {
+    content: "";
+    position: absolute;
+    left: 0;
+  }
+
+  .nav-toggle-icon::before {
+    top: -6px;
+  }
+
+  .nav-toggle-icon::after {
+    top: 6px;
+  }
+
+  .site-nav {
+    flex-basis: 100%;
+  }
+
+  .site-nav ul {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0 0 var(--space-s);
+    list-style: none;
+  }
+
+  .site-nav a {
+    display: block;
+    padding: var(--space-xs) 0;
+    color: var(--on-band);
+    font-size: var(--step-1);
+    font-weight: 500;
+    text-decoration: none;
+    border-block-end: 1px solid
+      color-mix(in srgb, var(--on-band) 15%, transparent);
+  }
+
+  .site-nav a:hover {
+    color: var(--on-band-accent);
+  }
+
+  .site-nav a[aria-current="page"],
+  .site-nav a[data-section] {
+    color: var(--on-band-accent);
+  }
+
+  /* Folded menu below the desktop breakpoint, once the script runs */
+  @media (max-width: 63.99rem) {
+    .site-header[data-enhanced] .nav-toggle {
+      display: inline-flex;
+    }
+
+    .site-header[data-enhanced]:not([data-open]) .site-nav {
+      display: none;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .bar {
+      flex-wrap: nowrap;
+      padding-block: var(--space-s);
+    }
+
+    .brand img {
+      height: 3.75rem;
+    }
+
+    .site-nav {
+      flex-basis: auto;
+    }
+
+    .site-nav ul {
+      flex-direction: row;
+      gap: var(--space-m);
+      padding: 0;
+    }
+
+    .site-nav a {
+      padding: var(--space-xs) 0;
+      font-size: var(--step-0);
+      border-block-end: 2px solid transparent;
+    }
+
+    .site-nav a[aria-current="page"],
+    .site-nav a[data-section] {
+      border-block-end-color: var(--on-band-accent);
+    }
+  }
+</style>

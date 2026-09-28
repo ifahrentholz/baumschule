@@ -1,0 +1,76 @@
+/*
+ * Design tokens. The four brand colours are the live site's, taken from its
+ * theme stylesheet (wp-content/themes/bsf/style.css). They are fixed (D10)
+ * and live only here, not in the CMS. Everything else here is new.
+ */
+:root {
+  /* Brand colours */
+  --color-fir: #0a4a26; /* Tannengrün: nav band, logo background */
+  --color-leaf: #64a608; /* Fischer-Grün: --main-fg-color of the old theme */
+  --color-moss: #458019; /* Moosgrün: headline plates on the old home page */
+  --color-claim: #f2e71b; /* Claim-Gelb: logo lettering */
+
+  /* Derived neutrals */
+  --color-ink: #1b2a21;
+  --color-ink-soft: #46554b;
+  --color-paper: #ffffff;
+  --color-mist: #eef2e7;
+  --color-rule: #cfd8c8;
+  --color-fir-deep: #06331a;
+
+  /* Roles. Contrast on paper: fir 10.4:1, moss 4.8:1; leaf is 3:1 and so
+     only used for rules and large marks, never for body text. Claim yellow
+     is only used on fir (8:1). */
+  --text: var(--color-ink);
+  --text-muted: var(--color-ink-soft);
+  --link: var(--color-fir);
+  --link-hover: var(--color-moss);
+  --surface: var(--color-paper);
+  --surface-alt: var(--color-mist);
+  --band: var(--color-fir);
+  --on-band: var(--color-paper);
+  --on-band-accent: var(--color-claim);
+  --focus: var(--color-leaf);
+
+  /* Type: Alegreya for reading and headings, Alegreya Sans for interface
+     text (navigation, breadcrumb, footer, buttons). */
+  --font-text: "Alegreya Variable", "Alegreya", Georgia, serif;
+  --font-ui: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+
+  /* Modular scale, ratio 1.25 on an 18px body */
+  --step--1: 0.9rem;
+  --step-0: 1.125rem;
+  --step-1: 1.40625rem;
+  --step-2: 1.7578rem;
+  --step-3: 2.1973rem;
+  --step-4: clamp(2.1973rem, 1.6rem + 2.4vw, 2.7466rem);
+  --step-display: clamp(2.5rem, 1.3rem + 5.6vw, 5.75rem);
+
+  --leading-text: 1.6;
+  --leading-tight: 1.1;
+  --measure: 66ch;
+
+  /* Space, on a 0.5rem rhythm */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-s: 1rem;
+  --space-m: 1.5rem;
+  --space-l: 2.5rem;
+  --space-xl: clamp(3rem, 2rem + 4vw, 5rem);
+
+  /* Layout grid: 12 columns inside a centred frame */
+  --frame-max: 76rem;
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+  --grid-gap: clamp(1rem, 0.6rem + 1.5vw, 2rem);
+
+  /* Planting rows: the one decorative device. Evenly spaced vertical rows,
+     like nursery quarters seen from above; marks the edge of a band. */
+  --rows: repeating-linear-gradient(
+    90deg,
+    var(--color-leaf) 0 3px,
+    transparent 3px 14px
+  );
+  --rows-height: 0.625rem;
+
+  --radius: 3px;
+}

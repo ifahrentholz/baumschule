@@ -73,22 +73,6 @@ export function createCmsConfig({ siteUrl }: CmsConfigOptions): CmsConfig {
           { name: "email", label: "E-Mail", required: false },
           { name: "vat_id", label: "USt-IdNr.", required: false },
           { name: "logo", label: "Logo", widget: "image" },
-          {
-            name: "brand_colors",
-            label: "Markenfarben",
-            widget: "list",
-            required: false,
-            hint: "Referenz der Logo- und Markenfarben für das Design.",
-            fields: [
-              { name: "name", label: "Name" },
-              {
-                name: "value",
-                label: "Farbe",
-                widget: "color",
-                allowInput: true,
-              },
-            ],
-          },
         ],
       },
     ],

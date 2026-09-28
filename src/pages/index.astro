@@ -1,10 +1,97 @@
 ---
-// Placeholder home page until the design system and content land.
+// Home page shell: the brand band with the company name and the main
+// sections as signposts. Notices, opening hours and teasers follow in their
+// content tickets.
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { MAIN_NAV, withBase } from "../navigation";
+import { loadSiteSettings } from "../site-settings";
+
+const { company_name } = loadSiteSettings();
+const base = import.meta.env.BASE_URL;
+const signposts = MAIN_NAV.filter((item) => item.path !== "/kontakt/");
 ---
 
-<BaseLayout title="Baumschule Fischer">
-  <main>
-    <h1>Baumschule Fischer</h1>
-  </main>
+<BaseLayout>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="frame">
+      <h1 id="hero-title">{company_name}</h1>
+    </div>
+  </section>
+
+  <nav class="frame signposts" aria-label="Bereiche">
+    <ul>
+      {signposts.map((item) => (
+        <li>
+          <a href={withBase(base, item.path)}>{item.label}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
 </BaseLayout>
+
+<style>
+  .hero {
+    /* The band continues the header; its planting rows move from under the
+       navigation to the bottom edge of the hero. */
+    margin-block-start: calc(-1 * var(--rows-height));
+    padding-block: var(--space-l) calc(var(--space-xl) + var(--rows-height));
+    background:
+      var(--rows) bottom / 100% var(--rows-height) no-repeat,
+      var(--band);
+    color: var(--on-band-accent);
+  }
+
+  .hero h1 {
+    max-width: 14ch;
+    margin: 0;
+    font-size: var(--step-display);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.015em;
+  }
+
+  .signposts ul {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-block-start: 1px solid var(--color-rule);
+  }
+
+  .signposts a {
+    display: block;
+    padding: var(--space-s) 0;
+    border-block-end: 1px solid var(--color-rule);
+    color: var(--color-fir);
+    font-size: var(--step-2);
+    font-weight: 700;
+    line-height: var(--leading-tight);
+    text-decoration: none;
+  }
+
+  .signposts a:hover {
+    color: var(--color-moss);
+    border-block-end-color: var(--color-leaf);
+  }
+
+  @media (min-width: 40rem) {
+    .signposts ul {
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: var(--grid-gap);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .signposts ul {
+      grid-template-columns: repeat(5, 1fr);
+      border-block-start: 0;
+    }
+
+    .signposts a {
+      padding-block: var(--space-m);
+      border-block-end-width: 3px;
+      font-size: var(--step-1);
+    }
+  }
+</style>

@@ -1,17 +1,32 @@
 ---
 // Shared document shell for every page. Indexing is driven by SITE_INDEXING
 // (see src/indexing.ts), so phase 2 switches it off without a code change.
+// Fonts are bundled from npm (@fontsource), so no page requests a font from
+// a third-party origin (AC-7).
+import "@fontsource-variable/alegreya/wght.css";
+import "@fontsource-variable/alegreya/wght-italic.css";
+import "@fontsource/alegreya-sans/latin-400.css";
+import "@fontsource/alegreya-sans/latin-500.css";
+import "@fontsource/alegreya-sans/latin-700.css";
+import "../styles/tokens.css";
+import "../styles/global.css";
 import SiteFooter from "../components/SiteFooter.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import { resolveIndexing } from "../indexing";
+import { loadSiteSettings } from "../site-settings";
 
 interface Props {
-  title: string;
+  /** Page title; left out on the home page, which uses the company name. */
+  title?: string;
 }
 
 const { title } = Astro.props;
+const { company_name } = loadSiteSettings();
+const documentTitle = title ? `${title} – ${company_name}` : company_name;
 const noindex = resolveIndexing(process.env) === "noindex";
 const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+// The current page as a site path without the base path, e.g. `/kontakt/`.
+const currentPath = Astro.url.pathname.slice(base.length) || "/";
 ---
 
 <!doctype html>
@@ -20,12 +35,18 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#0a4a26" />
     <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
-    <title>{title}</title>
+    <title>{documentTitle}</title>
   </head>
   <body>
-    <SiteHeader />
-    <slot />
+    <a class="skip-link visually-hidden" href="#inhalt">
+      Zum Inhalt springen
+    </a>
+    <SiteHeader currentPath={currentPath} />
+    <main id="inhalt" tabindex="-1">
+      <slot />
+    </main>
     <SiteFooter />
   </body>
 </html>

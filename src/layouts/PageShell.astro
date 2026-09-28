@@ -1,0 +1,199 @@
+---
+// Layout for every page below the home page: breadcrumb and heading from the
+// navigation tree, links to the pages of its section, then the page content.
+// Pages without content yet (content tickets follow #4) render a short
+// notice instead.
+import BaseLayout from "./BaseLayout.astro";
+import { breadcrumbTrail, MAIN_NAV, withBase } from "../navigation";
+
+interface Props {
+  /** Site path of the page, e.g. `/sortiment/rosen/`. */
+  path: string;
+  /** Heading, if it differs from the navigation label. */
+  heading?: string;
+  lead?: string;
+}
+
+const { path, heading, lead } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const trail = breadcrumbTrail(path);
+const page = trail.at(-1);
+if (!page) throw new Error(`PageShell: ${path} is not in src/navigation.ts`);
+const title = heading ?? page.label;
+const section = MAIN_NAV.find((item) => item.path === trail[0]?.path);
+const sectionPages = section?.children ?? [];
+const hasContent = Astro.slots.has("default");
+---
+
+<BaseLayout title={title}>
+  <div class="page-head">
+    <div class="frame">
+      <nav class="breadcrumb" aria-label="Brotkrumen">
+        <ol>
+          <li>
+            <a href={withBase(base, "/")}>Startseite</a>
+          </li>
+          {trail.map((item) => (
+            <li>
+              <a
+                href={withBase(base, item.path)}
+                aria-current={item === page ? "page" : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+      <h1>{title}</h1>
+      {lead && <p class="lead measure">{lead}</p>}
+    </div>
+  </div>
+
+  <div class="frame grid page-body">
+    <div class="content measure">
+      {hasContent ? (
+        <slot />
+      ) : (
+        <p class="pending">
+          Diese Seite wird gerade neu aufgebaut. Bis dahin helfen wir Ihnen gern
+          telefonisch oder per E-Mail weiter.
+        </p>
+      )}
+    </div>
+
+    {section && sectionPages.length > 0 && (
+      <nav class="section-nav" aria-label={section.label}>
+        <a
+          class="section-nav-title"
+          href={withBase(base, section.path)}
+          aria-current={section === page ? "page" : undefined}
+        >
+          {section.label}
+        </a>
+        <ul>
+          {sectionPages.map((item) => (
+            <li>
+              <a
+                href={withBase(base, item.path)}
+                aria-current={item === page ? "page" : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .page-head {
+    padding-block: var(--space-l) var(--space-l);
+    background: var(--surface-alt);
+    border-block-end: 1px solid var(--color-rule);
+  }
+
+  .page-head h1 {
+    margin: 0;
+    color: var(--color-fir);
+    font-size: var(--step-display);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .lead {
+    margin: var(--space-s) 0 0;
+    color: var(--text-muted);
+    font-size: var(--step-1);
+    line-height: 1.45;
+  }
+
+  .breadcrumb {
+    margin-block-end: var(--space-s);
+    font-family: var(--font-ui);
+    font-size: var(--step--1);
+  }
+
+  .breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .breadcrumb li + li::before {
+    content: "/";
+    padding-inline: var(--space-xs);
+    color: var(--text-muted);
+  }
+
+  .breadcrumb a {
+    color: var(--text-muted);
+  }
+
+  .breadcrumb a[aria-current="page"] {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .page-body {
+    padding-block-start: var(--space-l);
+  }
+
+  .pending {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .section-nav {
+    font-family: var(--font-ui);
+    border-inline-start: 3px solid var(--color-leaf);
+    padding-inline-start: var(--space-s);
+    align-self: start;
+  }
+
+  .section-nav-title {
+    display: block;
+    margin-block-end: var(--space-xs);
+    color: var(--color-fir);
+    font-size: var(--step-1);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .section-nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .section-nav li a {
+    display: inline-block;
+    padding-block: 0.3rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .section-nav li a:hover {
+    color: var(--link-hover);
+    text-decoration: underline;
+  }
+
+  .section-nav a[aria-current="page"] {
+    color: var(--color-moss);
+    font-weight: 700;
+  }
+
+  @media (min-width: 64rem) {
+    .content {
+      grid-column: 1 / span 8;
+    }
+
+    .section-nav {
+      grid-column: 10 / -1;
+    }
+  }
+</style>
