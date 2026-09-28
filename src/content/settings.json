@@ -1,11 +1,11 @@
 {
   "company_name": "Baumschule",
   "operators": [
-    "Max Mustermann",
-    "Maxi Musterfrau"
+    "Max Mustermann 2",
+    "Maxi Musterfrau 2"
   ],
   "address": {
-    "street": "Musterstraße 1",
+    "street": "Musterstraße 1337",
     "postal_code": "12345",
     "city": "Berlin"
   },
