@@ -36,4 +36,25 @@ describe("resolveDeployTarget", () => {
       /SITE_URL/,
     );
   });
+
+  it("rejects a SITE_URL that carries a path, so it cannot double up with BASE_PATH", () => {
+    expect(() =>
+      resolveDeployTarget({ SITE_URL: "https://ifahrentholz.de/baumschule" }),
+    ).toThrow(/SITE_URL must be an origin/);
+  });
+
+  it("rejects a SITE_URL that carries a query or fragment", () => {
+    expect(() =>
+      resolveDeployTarget({ SITE_URL: "https://ifahrentholz.de?x=1" }),
+    ).toThrow(/SITE_URL must be an origin/);
+    expect(() =>
+      resolveDeployTarget({ SITE_URL: "https://ifahrentholz.de#top" }),
+    ).toThrow(/SITE_URL must be an origin/);
+  });
+
+  it("reduces a SITE_URL with a bare trailing slash to its origin", () => {
+    expect(
+      resolveDeployTarget({ SITE_URL: "https://ifahrentholz.de/" }).site,
+    ).toBe("https://ifahrentholz.de");
+  });
 });
