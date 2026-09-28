@@ -13,6 +13,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@sveltia/cms": "^0.222.1",
     "astro": "^7.3.5"
   },
   "devDependencies": {

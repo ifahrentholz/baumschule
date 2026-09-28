@@ -1,6 +1,8 @@
 ---
 // Shared document shell for every page. Indexing is driven by SITE_INDEXING
 // (see src/indexing.ts), so phase 2 switches it off without a code change.
+import SiteFooter from "../components/SiteFooter.astro";
+import SiteHeader from "../components/SiteHeader.astro";
 import { resolveIndexing } from "../indexing";
 
 interface Props {
@@ -22,6 +24,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, "");
     <title>{title}</title>
   </head>
   <body>
+    <SiteHeader />
     <slot />
+    <SiteFooter />
   </body>
 </html>

@@ -1,0 +1,16 @@
+---
+// Minimal header fed by the Settings singleton; styled in the design system
+// ticket (#4).
+import { Image } from "astro:assets";
+import { loadSiteSettings } from "../site-settings";
+
+const settings = loadSiteSettings();
+const home = import.meta.env.BASE_URL;
+---
+
+<header>
+  <a href={home}>
+    <Image src={settings.logoImage} alt="" height={48} loading="eager" />
+    <span>{settings.company_name}</span>
+  </a>
+</header>
