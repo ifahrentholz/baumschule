@@ -36,6 +36,13 @@ const MANIFEST_URL_KEYS = new Set([
   "action",
 ]);
 const SCHEME = /^[a-z][a-z0-9+.-]*:/i;
+// Relative module specifiers in bundled JS: static and dynamic imports, and
+// `new URL(..., import.meta.url)` (workers, wasm).
+const RELATIVE_SPECIFIER =
+  /(?:\bfrom\s*|\bimport\s*\(?\s*|\bnew\s+URL\s*\(\s*)(["'`])(\.{1,2}\/[^"'`\s\\]+)\1/g;
+
+/** The Sveltia CMS editing UI lives below this dist/ folder (`/admin`). */
+const ADMIN_DIR = "admin/";
 
 type FileKind = "html" | "css" | "js" | "xml" | "manifest";
 
@@ -105,10 +112,7 @@ export function findInternalUrls(
       break;
   }
 
-  const documentUrl = new URL(
-    target.base === "/" ? `/${file.path}` : `${target.base}/${file.path}`,
-    target.site,
-  );
+  const documentUrl = documentUrlOf(file.path, target);
   const hosts = ownHosts(target.site);
   return found
     .sort((a, b) => a.index - b.index)
@@ -130,22 +134,30 @@ export function verifyDist(
   const problems: string[] = [];
   let htmlFiles = 0;
   let internalUrls = 0;
+  const cmsScripts = adminOnlyScripts(files, target);
 
   for (const file of files) {
     if (kindOf(file.path) === "html") {
       htmlFiles++;
       const noindex = hasNoindexMeta(file.content);
-      if (indexing === "noindex" && !noindex) {
+      // The editing UI is never content, so it stays noindex in both phases.
+      const pageIndexing = isAdminPage(file.path) ? "noindex" : indexing;
+      if (pageIndexing === "noindex" && !noindex) {
         problems.push(
           `${file.path}: missing <meta name="robots" content="noindex">`,
         );
       }
-      if (indexing === "index" && noindex) {
+      if (pageIndexing === "index" && noindex) {
         problems.push(
           `${file.path}: carries a noindex robots meta in an index build`,
         );
       }
     }
+
+    // The CMS bundle is third-party code full of GitHub API paths ("/user",
+    // "/repos/...") that the JS string heuristic would take for site URLs.
+    // The admin page itself, and every script a site page loads, is checked.
+    if (cmsScripts.has(file.path)) continue;
 
     let urls: string[];
     try {
@@ -181,6 +193,84 @@ export function verifyDist(
     );
   }
   return problems;
+}
+
+/** True for an HTML page of the CMS editing UI. */
+export function isAdminPage(path: string): boolean {
+  return path.startsWith(ADMIN_DIR) && kindOf(path) === "html";
+}
+
+/**
+ * The JS files that only the admin pages load, directly or through imports,
+ * and no other page does. Scripts no page loads are not included.
+ */
+export function adminOnlyScripts(
+  files: DistFile[],
+  target: DeployTarget,
+): Set<string> {
+  const byPath = new Map(files.map((file) => [file.path, file]));
+  const pages = files.filter((file) => kindOf(file.path) === "html");
+  const fromAdmin = scriptsLoadedBy(
+    pages.filter((page) => isAdminPage(page.path)),
+    byPath,
+    target,
+  );
+  const fromSite = scriptsLoadedBy(
+    pages.filter((page) => !isAdminPage(page.path)),
+    byPath,
+    target,
+  );
+  return new Set([...fromAdmin].filter((path) => !fromSite.has(path)));
+}
+
+function scriptsLoadedBy(
+  pages: DistFile[],
+  byPath: Map<string, DistFile>,
+  target: DeployTarget,
+): Set<string> {
+  const loaded = new Set<string>();
+  const queue = [...pages];
+  while (queue.length > 0) {
+    const file = queue.pop()!;
+    for (const path of scriptReferences(file, target)) {
+      const script = byPath.get(path);
+      if (loaded.has(path) || !script) continue;
+      loaded.add(path);
+      queue.push(script);
+    }
+  }
+  return loaded;
+}
+
+/** dist/ paths of the JS files a file references. */
+function scriptReferences(file: DistFile, target: DeployTarget): string[] {
+  let urls: string[];
+  try {
+    urls = findInternalUrls(file, target);
+  } catch {
+    urls = [];
+  }
+  if (kindOf(file.path) === "js") {
+    const documentUrl = documentUrlOf(file.path, target);
+    for (const match of file.content.matchAll(RELATIVE_SPECIFIER)) {
+      urls.push(new URL(match[2]!, documentUrl).pathname);
+    }
+  }
+  return urls
+    .map((url) => toDistPath(url.replace(/[?#].*$/, ""), target.base))
+    .filter((path): path is string => path !== null && kindOf(path) === "js");
+}
+
+function toDistPath(path: string, base: string): string | null {
+  const prefix = base === "/" ? "/" : `${base}/`;
+  return path.startsWith(prefix) ? path.slice(prefix.length) : null;
+}
+
+function documentUrlOf(path: string, target: DeployTarget): URL {
+  return new URL(
+    target.base === "/" ? `/${path}` : `${target.base}/${path}`,
+    target.site,
+  );
 }
 
 /** True if a root-relative path escapes the base path. */

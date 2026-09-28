@@ -348,6 +348,76 @@ describe("verifyDist", () => {
       "no internal URL found in any checked file: the base-path check had nothing to check",
     ]);
   });
+
+  describe("the CMS admin page", () => {
+    const adminPage = (base: string) =>
+      `<html><head><meta name="robots" content="noindex, nofollow"></head>
+      <body><script type="module" src="${base}/_astro/admin.js"></script></body></html>`;
+
+    it("must carry noindex in the production build too", () => {
+      const files = [
+        { path: "index.html", content: livePage },
+        {
+          path: "admin/index.html",
+          content: adminPage("").replace(/<meta name="robots"[^>]*>/, ""),
+        },
+        { path: "robots.txt", content: robots },
+      ];
+      expect(verifyDist(files, PHASE_2, "index")).toEqual([
+        'admin/index.html: missing <meta name="robots" content="noindex">',
+      ]);
+      files[1]!.content = adminPage("");
+      expect(verifyDist(files, PHASE_2, "index")).toEqual([]);
+    });
+
+    it("is itself checked against the base path", () => {
+      const files = [
+        { path: "index.html", content: previewPage },
+        { path: "admin/index.html", content: adminPage("") },
+        { path: "robots.txt", content: robots },
+      ];
+      expect(verifyDist(files, PHASE_1, "noindex")).toEqual([
+        "admin/index.html: URL outside base /baumschule: /_astro/admin.js",
+      ]);
+    });
+
+    it("skips the JS string check for scripts only the admin page loads: the CMS bundle's API paths are not site URLs", () => {
+      const files = [
+        { path: "index.html", content: previewPage },
+        { path: "admin/index.html", content: adminPage("/baumschule") },
+        {
+          path: "_astro/admin.js",
+          content:
+            'import{a}from"./cms-core.js";fetch("/repos/x");import(`./lang.js`);new Worker(new URL("/baumschule/_astro/worker.js",import.meta.url))',
+        },
+        { path: "_astro/cms-core.js", content: 'fetch("/user")' },
+        { path: "_astro/lang.js", content: 'x="/deep/"' },
+        { path: "_astro/worker.js", content: 'x="/home/web_user"' },
+        { path: "robots.txt", content: robots },
+      ];
+      expect(verifyDist(files, PHASE_1, "noindex")).toEqual([]);
+    });
+
+    it("still checks a script a site page loads, even if the admin page loads it too", () => {
+      const files = [
+        {
+          path: "index.html",
+          content:
+            previewPage +
+            `<script type="module" src="/baumschule/_astro/shared.js"></script>`,
+        },
+        { path: "admin/index.html", content: adminPage("/baumschule") },
+        { path: "_astro/admin.js", content: 'import"./shared.js"' },
+        { path: "_astro/shared.js", content: 'location.href="/c"' },
+        { path: "_astro/orphan.js", content: 'location.href="/d"' },
+        { path: "robots.txt", content: robots },
+      ];
+      expect(verifyDist(files, PHASE_1, "noindex")).toEqual([
+        "_astro/shared.js: URL outside base /baumschule: /c",
+        "_astro/orphan.js: URL outside base /baumschule: /d",
+      ]);
+    });
+  });
 });
 
 describe("robotsTxtDisallowsAll", () => {
