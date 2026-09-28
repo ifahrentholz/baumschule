@@ -1,0 +1,4 @@
+.omnigent/runs/
+node_modules/
+dist/
+.astro/
