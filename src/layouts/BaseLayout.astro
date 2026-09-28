@@ -1,0 +1,27 @@
+---
+// Shared document shell for every page. Indexing is driven by SITE_INDEXING
+// (see src/indexing.ts), so phase 2 switches it off without a code change.
+import { resolveIndexing } from "../indexing";
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+const noindex = resolveIndexing(process.env) === "noindex";
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
