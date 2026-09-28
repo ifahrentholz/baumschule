@@ -1,12 +1,15 @@
 {
-  "company_name": "Baumschule Fischer",
-  "operators": ["Felix Fischer", "Katrin Fischer"],
+  "company_name": "Baumschule",
+  "operators": [
+    "Max Mustermann",
+    "Maxi Musterfrau"
+  ],
   "address": {
-    "street": "Lettberger Str. 95",
-    "postal_code": "12355",
+    "street": "Musterstraße 1",
+    "postal_code": "12345",
     "city": "Berlin"
   },
-  "phone": "+49 30 6635041",
+  "phone": "+49 30 1234567",
   "fax": "",
   "email": "",
   "vat_id": "DE 135829629",
