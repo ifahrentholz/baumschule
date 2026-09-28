@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Typecheck
+        run: npm run check
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # AC-1: the build must be fully static — HTML in dist/, no server entry.
+      - name: Verify static output
+        run: |
+          test -f dist/index.html || { echo "dist/index.html missing"; exit 1; }
+          if [ -d dist/server ]; then echo "dist/server exists: build is not static"; exit 1; fi
