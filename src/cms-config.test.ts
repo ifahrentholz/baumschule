@@ -1,14 +1,23 @@
-import { readFileSync } from "node:fs";
-import type { CollectionFile, Field, VariableFieldType } from "@sveltia/cms";
+import { readdirSync, readFileSync } from "node:fs";
+import type {
+  CollectionFile,
+  EntryCollection,
+  Field,
+  VariableFieldType,
+} from "@sveltia/cms";
 import { getFileInfo } from "prettier";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   IMAGE_FOLDER,
+  NOTICES_FOLDER,
   OPENING_HOURS_FILE,
+  SEASONAL_OFFERS_FOLDER,
   SETTINGS_FILE,
   createCmsConfig,
 } from "./cms-config";
+import { parseNotices } from "./notices";
 import { parseOpeningHours, weekRows } from "./opening-hours";
+import { parseSeasonalOffers } from "./seasonal-offers";
 import { parseSettings } from "./settings";
 
 const PHASE_1_SITE = "https://ifahrentholz.de/baumschule/";
@@ -22,6 +31,15 @@ function singletons(): CollectionFile[] {
 function singleton(name: string): CollectionFile {
   const found = singletons().find((entry) => entry.name === name);
   if (!found) throw new Error(`no ${name} singleton`);
+  return found;
+}
+
+function entryCollection(name: string): EntryCollection {
+  const found = createCmsConfig({ siteUrl: PHASE_1_SITE }).collections?.find(
+    (entry): entry is EntryCollection =>
+      "folder" in entry && entry.name === name,
+  );
+  if (!found) throw new Error(`no ${name} collection`);
   return found;
 }
 
@@ -147,12 +165,146 @@ describe("the files the CMS writes", () => {
   // Prettier would reformat. A format check on these files fails CI on every
   // CMS save and so blocks the deploy.
   it("are left out of the format check, so a CMS save cannot fail CI", async () => {
-    for (const { file } of singletons()) {
+    const collectionFiles = ["notices", "seasonal_offers"].map((name) => {
+      const { folder, extension } = entryCollection(name);
+      return `${folder}/new-entry.${extension}`;
+    });
+    for (const file of [
+      ...singletons().map((entry) => entry.file),
+      ...collectionFiles,
+    ]) {
       const { ignored } = await getFileInfo(file, {
         ignorePath: ".prettierignore",
       });
       expect(ignored, file).toBe(true);
     }
+  });
+});
+
+describe("the Notices collection", () => {
+  it("writes one JSON file per notice into the folder the home page reads", () => {
+    const notices = entryCollection("notices");
+    expect(notices.folder).toBe(NOTICES_FOLDER);
+    expect(notices.format).toBe("json");
+    expect(notices.extension).toBe("json");
+  });
+
+  it("edits text, link and window, with only the text required", () => {
+    const { fields } = entryCollection("notices");
+    expect(fieldNames(fields)).toEqual([
+      "text",
+      "link",
+      "visible_from",
+      "visible_until",
+    ]);
+    const optional = fields
+      .filter((field) => "required" in field && field.required === false)
+      .map((field) => ("name" in field ? field.name : ""));
+    expect(optional).toEqual(["link", "visible_from", "visible_until"]);
+  });
+});
+
+describe("the Seasonal offers collection", () => {
+  it("writes one Markdown file per offer, named by its editable slug", () => {
+    const offers = entryCollection("seasonal_offers");
+    expect(offers.folder).toBe(SEASONAL_OFFERS_FOLDER);
+    expect(offers.extension).toBe("md");
+    expect(offers.slug).toMatchObject({ editable: true });
+  });
+
+  it("edits title, a required month/day window, image and body", () => {
+    const { fields } = entryCollection("seasonal_offers");
+    expect(fieldNames(fields)).toEqual([
+      "title",
+      "visible_from",
+      "visible_until",
+      "image",
+      "body",
+    ]);
+    for (const name of ["visible_from", "visible_until"]) {
+      const field = fields.find(
+        (entry) => "name" in entry && entry.name === name,
+      );
+      expect(field && "required" in field ? field.required : true).not.toBe(
+        false,
+      );
+      expect(
+        fieldNames(field && "fields" in field ? (field.fields ?? []) : []),
+      ).toEqual(["day", "month"]);
+    }
+  });
+});
+
+describe("the committed notices", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  // The old home page's "Zeile 00" posts (content inventory §4): the
+  // Staudenmarkt notice and the teaser for the job postings.
+  it("hold the old home page's notices, all valid", () => {
+    const warn = vi.spyOn(console, "warn");
+    const files = Object.fromEntries(
+      readdirSync(NOTICES_FOLDER).map((name) => [
+        `${NOTICES_FOLDER}/${name}`,
+        JSON.parse(readFileSync(`${NOTICES_FOLDER}/${name}`, "utf8")),
+      ]),
+    );
+    expect(parseNotices(files)).toEqual([
+      {
+        id: "staudenmarkt",
+        text: "Staudenmarkt 05./06. Sept.",
+        window: { kind: "dates", until: "2026-09-06" },
+      },
+      {
+        id: "stellenanzeigen",
+        text: "Stellenanzeigen",
+        link: "/karriere/",
+        window: { kind: "dates" },
+      },
+    ]);
+    expect(warn).not.toHaveBeenCalled();
+  });
+});
+
+describe("the committed seasonal offers", () => {
+  it("are Obstverkostung and Apfelsaft", () => {
+    expect(readdirSync(SEASONAL_OFFERS_FOLDER).sort()).toEqual([
+      "apfelsaft.md",
+      "obstverkostung.md",
+    ]);
+  });
+
+  // Owner decision (issue #7 review): both recur 1 September - 30 November.
+  // Body text and image were migrated read-only from the old live pages
+  // (spec D14).
+  it("are valid, windowed 1 September to 30 November, and each produce a /saison/<slug>/ page", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const files = import.meta.glob<{ frontmatter: unknown }>(
+      "/src/content/seasonal-offers/*.md",
+      { eager: true },
+    );
+    const offers = parseSeasonalOffers(files).map(({ offer }) => offer);
+    expect(offers.map((offer) => offer.slug)).toEqual([
+      "apfelsaft",
+      "obstverkostung",
+    ]);
+    for (const offer of offers) {
+      expect(offer.window).toEqual({
+        kind: "yearly",
+        from: "09-01",
+        until: "11-30",
+      });
+    }
+    expect(warn).not.toHaveBeenCalled();
+    vi.restoreAllMocks();
+
+    const { getStaticPaths } = await import("./pages/saison/[slug].astro");
+    expect(
+      getStaticPaths()
+        .map((entry) => entry.params.slug)
+        .sort(),
+    ).toEqual(["apfelsaft", "obstverkostung"]);
   });
 });
 

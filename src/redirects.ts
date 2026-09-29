@@ -117,7 +117,7 @@ const HOME_BLOCK =
 const HOME_CATEGORY =
   "Category that only grouped the old home page's building blocks; no archive exists on the new site.";
 const SEASONAL =
-  "Seasonal offer: /saison/<slug>/ only exists while the offer is in its window, so the stable target is the home page, which links the current offer.";
+  "Seasonal offer: its /saison/<slug>/ page only shows the offer while it is in its window, and the slug is editable in the CMS, so the stable target is the home page, which links the current offer.";
 
 export const REDIRECTS: Redirect[] = [
   // Pages

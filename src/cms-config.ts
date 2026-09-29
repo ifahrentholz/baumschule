@@ -10,7 +10,12 @@
  * triggers the CI deploy. Field labels are German because the editors are;
  * field names are English, like the rest of the content model.
  */
-import type { CmsConfig, Field, VariableFieldType } from "@sveltia/cms";
+import type {
+  CmsConfig,
+  EntryCollection,
+  Field,
+  VariableFieldType,
+} from "@sveltia/cms";
 import { MONTH_LABELS, WEEKDAY_LABELS, WEEKDAYS } from "./opening-hours";
 
 /** Repository folder for images uploaded through the CMS. */
@@ -24,6 +29,18 @@ export const SETTINGS_FILE = "src/content/settings.json";
  * `src/components/OpeningHours.astro`.
  */
 export const OPENING_HOURS_FILE = "src/content/opening-hours.json";
+
+/**
+ * Repository folder of the Notices collection, one JSON file per notice,
+ * read by `src/components/Notices.astro`.
+ */
+export const NOTICES_FOLDER = "src/content/notices";
+
+/**
+ * Repository folder of the Seasonal offers collection, one Markdown file per
+ * offer, read by `src/seasonal-offer-entries.ts`.
+ */
+export const SEASONAL_OFFERS_FOLDER = "src/content/seasonal-offers";
 
 const MONTH_OPTIONS = MONTH_LABELS.map((label, i) => ({
   label,
@@ -101,6 +118,98 @@ const EXCEPTION_TYPES: VariableFieldType[] = [
   },
 ];
 
+/** A month and a day of a seasonal offer's yearly window. */
+function monthDayField(name: string, label: string): Field {
+  return {
+    name,
+    label,
+    widget: "object",
+    fields: [
+      {
+        name: "day",
+        label: "Tag",
+        widget: "number",
+        value_type: "int",
+        min: 1,
+        max: 31,
+      },
+      {
+        name: "month",
+        label: "Monat",
+        widget: "select",
+        options: MONTH_OPTIONS,
+      },
+    ],
+  };
+}
+
+const NOTICES: EntryCollection = {
+  name: "notices",
+  label: "Hinweise",
+  label_singular: "Hinweis",
+  description:
+    "Kurze Hinweise auf der Startseite. Sie erscheinen nur zwischen „Sichtbar ab“ und „Sichtbar bis“ (jeweils einschließlich); ein leeres Feld heißt: ohne Beginn bzw. ohne Ende.",
+  folder: NOTICES_FOLDER,
+  extension: "json",
+  format: "json",
+  identifier_field: "text",
+  slug: "{{uuid_short}}",
+  summary: "{{fields.text}}",
+  fields: [
+    { name: "text", label: "Text", widget: "text" },
+    {
+      name: "link",
+      label: "Link",
+      required: false,
+      hint: "Eine Seite dieser Website (z. B. /karriere/) oder eine vollständige Adresse (https://…).",
+      pattern: ["^(/|https?://)", "Mit / oder https:// beginnen"],
+    },
+    {
+      name: "visible_from",
+      label: "Sichtbar ab",
+      widget: "datetime",
+      type: "date",
+      format: "YYYY-MM-DD",
+      required: false,
+    },
+    {
+      name: "visible_until",
+      label: "Sichtbar bis",
+      widget: "datetime",
+      type: "date",
+      format: "YYYY-MM-DD",
+      required: false,
+    },
+  ],
+};
+
+const SEASONAL_OFFERS: EntryCollection = {
+  name: "seasonal_offers",
+  label: "Saisonangebote",
+  label_singular: "Saisonangebot",
+  description:
+    "Angebote wie Obstverkostung oder Apfelsaft. Jedes hat eine eigene Seite unter /saison/<Kurzname>/ und erscheint jedes Jahr zwischen „Sichtbar ab“ und „Sichtbar bis“ (jeweils einschließlich) auf der Startseite.",
+  folder: SEASONAL_OFFERS_FOLDER,
+  extension: "md",
+  format: "yaml-frontmatter",
+  slug: {
+    template: "{{title}}",
+    editable: true,
+    hint: "Kurzname in der Adresse /saison/<Kurzname>/",
+    pattern: [
+      "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "Nur Kleinbuchstaben, Ziffern und einzelne Bindestriche",
+    ],
+  },
+  fields: [
+    { name: "title", label: "Titel" },
+    monthDayField("visible_from", "Sichtbar ab"),
+    monthDayField("visible_until", "Sichtbar bis"),
+    { name: "image", label: "Bild", widget: "image", required: false },
+    { name: "body", label: "Text", widget: "markdown", required: false },
+  ],
+};
+
 export interface CmsConfigOptions {
   /** Absolute URL of the site's home page, including the base path. */
   siteUrl: string;
@@ -122,6 +231,7 @@ export function createCmsConfig({ siteUrl }: CmsConfigOptions): CmsConfig {
     publish_mode: "simple",
     media_folder: IMAGE_FOLDER,
     public_folder: `/${IMAGE_FOLDER}`,
+    collections: [NOTICES, SEASONAL_OFFERS],
     singletons: [
       {
         name: "settings",

@@ -39,6 +39,21 @@ prefix belongs in `BASE_PATH`, otherwise it would appear twice in URLs.
 Every push to `main` builds the site in CI and deploys `dist/` to GitHub Pages
 (`https://ifahrentholz.de/baumschule`).
 
+CI also rebuilds and redeploys once a day on a `schedule` trigger
+(`.github/workflows/ci.yml:12`, just after midnight in Berlin), so that
+notices and seasonal offers whose visibility window ended overnight (AC-5)
+drop out of the static HTML for visitors without JavaScript and for
+crawlers, even on a day with no commit. **GitHub disables a repository's
+scheduled workflows after 60 days without any repository activity** (a push,
+merge, or similar); once disabled, the daily rebuild silently stops and the
+static HTML can fall behind until the next commit. The client-side
+visibility check (`src/components/VisibilityWindows.astro`) still keeps
+pages correct for JavaScript visitors either way. If the scheduled run
+stops: open the repository's Actions tab, re-enable the workflow (GitHub
+shows a banner/notice for a disabled scheduled workflow there), and consider
+pushing a small commit occasionally to keep the 60-day clock from expiring
+again.
+
 In phase 1 the `noindex` meta robots tag is the only thing that keeps the
 preview out of search results. `robots.txt` cannot help. Crawlers read it
 only from the root of a host, and the preview's copy is served at

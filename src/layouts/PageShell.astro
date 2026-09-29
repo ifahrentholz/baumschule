@@ -2,7 +2,8 @@
 // Layout for every page below the home page: breadcrumb and heading from the
 // navigation tree, links to the pages of its section, then the page content.
 // Pages without content yet (content tickets follow #4) render a short
-// notice instead.
+// notice instead. A page outside the tree (a seasonal offer) passes its
+// `heading` and gets a breadcrumb of just itself.
 import BaseLayout from "./BaseLayout.astro";
 import { breadcrumbTrail, MAIN_NAV, withBase } from "../navigation";
 
@@ -16,7 +17,9 @@ interface Props {
 
 const { path, heading, lead } = Astro.props;
 const base = import.meta.env.BASE_URL;
-const trail = breadcrumbTrail(path);
+const treeTrail = breadcrumbTrail(path);
+const trail =
+  treeTrail.length === 0 && heading ? [{ label: heading, path }] : treeTrail;
 const page = trail.at(-1);
 if (!page) throw new Error(`PageShell: ${path} is not in src/navigation.ts`);
 const title = heading ?? page.label;

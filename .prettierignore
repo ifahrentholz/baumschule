@@ -8,3 +8,5 @@ docs/specs/
 # every CMS save and block the deploy.
 src/content/settings.json
 src/content/opening-hours.json
+src/content/notices/
+src/content/seasonal-offers/

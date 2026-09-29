@@ -3,6 +3,13 @@ name: CI
 on:
   push:
   pull_request:
+  # AC-5: notices and seasonal offers are shown by their visibility window.
+  # The pages re-check the window in the browser (Berlin time), but the HTML
+  # itself only changes on a build, so rebuild and redeploy once a day just
+  # after midnight in Berlin (23:05 UTC is 00:05 CET / 01:05 CEST) to keep it
+  # at most a day behind for visitors without JavaScript and for crawlers.
+  schedule:
+    - cron: "5 23 * * *"
 
 permissions:
   contents: read
@@ -46,7 +53,7 @@ jobs:
         run: node scripts/verify-dist.ts
 
       - name: Upload Pages artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v5
         with:
           path: dist
@@ -76,7 +83,7 @@ jobs:
         run: node scripts/verify-dist.ts
 
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
     needs: [build, production-build]
     runs-on: ubuntu-latest
     permissions:
