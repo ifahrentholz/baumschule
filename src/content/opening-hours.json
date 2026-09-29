@@ -1,0 +1,90 @@
+{
+  "seasons": [
+    {
+      "name": "Pflanzzeit",
+      "months": [
+        3,
+        4,
+        5,
+        9,
+        10,
+        11
+      ],
+      "hours": [
+        {
+          "days": [
+            "mon",
+            "tue",
+            "wed",
+            "thu",
+            "fri"
+          ],
+          "opens": "07:00",
+          "closes": "18:00"
+        },
+        {
+          "days": [
+            "sat"
+          ],
+          "opens": "09:00",
+          "closes": "14:00"
+        }
+      ]
+    },
+    {
+      "name": "Sommer",
+      "months": [
+        6,
+        7,
+        8
+      ],
+      "hours": [
+        {
+          "days": [
+            "mon",
+            "tue",
+            "wed",
+            "thu"
+          ],
+          "opens": "07:00",
+          "closes": "16:00"
+        },
+        {
+          "days": [
+            "fri"
+          ],
+          "opens": "07:00",
+          "closes": "13:30"
+        }
+      ]
+    },
+    {
+      "name": "Winter",
+      "months": [
+        12,
+        1,
+        2
+      ],
+      "hours": [
+        {
+          "days": [
+            "mon",
+            "tue",
+            "wed",
+            "thu"
+          ],
+          "opens": "08:00",
+          "closes": "15:00"
+        },
+        {
+          "days": [
+            "fri"
+          ],
+          "opens": "08:00",
+          "closes": "14:00"
+        }
+      ]
+    }
+  ],
+  "exceptions": []
+}
