@@ -1,7 +1,8 @@
 ---
-// Home page shell: the brand band with the company name and the main
-// sections as signposts. Notices, opening hours and teasers follow in their
+// Home page shell: the brand band with the company name, the opening hours
+// and the main sections as signposts. Notices and teasers follow in their
 // content tickets.
+import OpeningHours from "../components/OpeningHours.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { MAIN_NAV, withBase } from "../navigation";
 import { loadSiteSettings } from "../site-settings";
@@ -17,6 +18,10 @@ const signposts = MAIN_NAV.filter((item) => item.path !== "/kontakt/");
       <h1 id="hero-title">{company_name}</h1>
     </div>
   </section>
+
+  <div class="frame hours">
+    <OpeningHours />
+  </div>
 
   <nav class="frame signposts" aria-label="Bereiche">
     <ul>
@@ -48,6 +53,10 @@ const signposts = MAIN_NAV.filter((item) => item.path !== "/kontakt/");
     font-weight: 800;
     line-height: 0.98;
     letter-spacing: -0.015em;
+  }
+
+  .hours {
+    padding-block: var(--space-l);
   }
 
   .signposts ul {

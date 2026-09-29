@@ -1,0 +1,268 @@
+---
+// Opening hours from the Opening hours singleton (src/content/opening-hours.json):
+// the "open now / closed" status, the exceptions still to come and the
+// season profiles. Every page that shows hours renders this component, so
+// they all come from the one entry (AC-4).
+//
+// The status and "which season or exception applies today" depend on the
+// visitor's moment, so the script below computes them in the browser
+// (Berlin time), with the same `hoursOn` precedence as the status line: an
+// exception in effect today gets the "gilt heute" badge instead of the
+// season, not next to it.
+// The build drops exceptions that were already over when it ran (from the
+// list and from the data the script reads); the script hides those that
+// have ended since. The exceptions list itself renders sorted by date;
+// `hoursOn`'s "first matching entry wins" precedence still uses the CMS's
+// own (unsorted) list order underneath.
+import raw from "../content/opening-hours.json";
+import {
+  berlinClock,
+  formatDate,
+  monthsLabel,
+  parseOpeningHours,
+  weekRows,
+  windowsText,
+  type Exception,
+} from "../opening-hours";
+
+interface Props {
+  /** Id of the heading, unique on the page. */
+  id?: string;
+}
+
+const { id = "oeffnungszeiten" } = Astro.props;
+const hours = parseOpeningHours(raw);
+const buildDate = berlinClock(new Date()).date;
+// Data order: as the CMS has them, so the client script's precedence rule
+// (first matching entry wins, same as `hoursOn`) still picks the right one.
+const exceptions = hours.exceptions.filter((entry) => entry.until >= buildDate);
+// Display order: earliest date first, independent of the data order above.
+// `index` keeps referring to the position in `exceptions`, so the script can
+// still look an item's entry up in the unsorted `data-opening-hours` payload.
+const exceptionsByDate = exceptions
+  .map((entry, index) => ({ entry, index }))
+  .sort((a, b) => a.entry.from.localeCompare(b.entry.from));
+
+function datesText({ from, until }: Exception): string {
+  return from === until
+    ? formatDate(from)
+    : `${formatDate(from)} – ${formatDate(until)}`;
+}
+---
+
+<section
+  class="opening-hours"
+  aria-labelledby={id}
+  data-opening-hours={JSON.stringify({ ...hours, exceptions })}
+>
+  <h2 id={id}>Öffnungszeiten</h2>
+  <p class="status" data-status hidden></p>
+
+  {exceptions.length > 0 && (
+    <div class="exceptions" data-exceptions>
+      <h3>Abweichende Öffnungszeiten</h3>
+      <ul>
+        {exceptionsByDate.map(({ entry, index }) => (
+          <li data-exception={index} data-until={entry.until}>
+            <strong>{datesText(entry)}:</strong> {windowsText(entry.windows)}
+            <span class="today" hidden>
+              gilt heute
+            </span>
+            {entry.note && <span class="note"> ({entry.note})</span>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+
+  <div class="seasons">
+    {hours.seasons.map((season, index) => (
+      <div class="season" data-season={index}>
+        <h3>
+          {season.name}
+          <span class="today" hidden>
+            gilt heute
+          </span>
+        </h3>
+        <p class="months">{monthsLabel(season.months)}</p>
+        <table>
+          <tbody>
+            {weekRows(season).map((row) => (
+              <tr>
+                <th scope="row">{row.days}</th>
+                <td>{row.hours}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ))}
+  </div>
+</section>
+
+<script>
+  import {
+    berlinClock,
+    hoursOn,
+    openStatus,
+    statusText,
+    type OpeningHours,
+  } from "../opening-hours";
+
+  function update(): void {
+    const now = new Date();
+    const today = berlinClock(now).date;
+    for (const root of document.querySelectorAll<HTMLElement>(
+      "[data-opening-hours]",
+    )) {
+      const hours = JSON.parse(root.dataset.openingHours ?? "") as OpeningHours;
+      const status = openStatus(hours, now);
+      const statusLine = root.querySelector<HTMLElement>("[data-status]");
+      if (statusLine) {
+        statusLine.textContent = statusText(status);
+        statusLine.dataset.open = String(status.open);
+        statusLine.hidden = false;
+      }
+
+      // Same rule as the status line above (`openStatus` also calls
+      // `hoursOn`): an exception in effect today replaces the season, so it
+      // gets the "gilt heute" badge instead of the season, not next to it.
+      const { season: seasonToday, exception: exceptionToday } = hoursOn(
+        hours,
+        today,
+      );
+      const seasonIndex = seasonToday ? hours.seasons.indexOf(seasonToday) : -1;
+      const exceptionIndex = exceptionToday
+        ? hours.exceptions.indexOf(exceptionToday)
+        : -1;
+
+      for (const season of root.querySelectorAll<HTMLElement>(
+        "[data-season]",
+      )) {
+        const isToday = Number(season.dataset.season) === seasonIndex;
+        season.classList.toggle("is-today", isToday);
+        const badge = season.querySelector<HTMLElement>(".today");
+        if (badge) badge.hidden = !isToday;
+      }
+
+      const exceptions = root.querySelector<HTMLElement>("[data-exceptions]");
+      if (exceptions) {
+        let upcoming = 0;
+        for (const item of exceptions.querySelectorAll<HTMLElement>(
+          "[data-until]",
+        )) {
+          item.hidden = (item.dataset.until ?? "") < today;
+          if (!item.hidden) upcoming += 1;
+          const isToday = Number(item.dataset.exception) === exceptionIndex;
+          const badge = item.querySelector<HTMLElement>(".today");
+          if (badge) badge.hidden = !isToday;
+        }
+        exceptions.hidden = upcoming === 0;
+      }
+    }
+  }
+
+  update();
+  setInterval(update, 60_000);
+</script>
+
+<style>
+  .opening-hours {
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  .status {
+    display: inline-block;
+    margin-block-end: var(--space-m);
+    padding: var(--space-2xs) var(--space-s);
+    border-radius: var(--radius);
+    background: var(--surface-alt);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-weight: 700;
+  }
+
+  .status[data-open="true"] {
+    background: var(--band);
+    color: var(--on-band);
+  }
+
+  .exceptions {
+    margin-block-end: var(--space-m);
+    padding: var(--space-s);
+    border-inline-start: 3px solid var(--color-claim);
+    background: var(--surface-alt);
+  }
+
+  .exceptions h3,
+  .season h3 {
+    font-size: var(--step-1);
+  }
+
+  .exceptions ul {
+    margin: 0;
+    padding-inline-start: 0;
+    list-style: none;
+  }
+
+  .note {
+    color: var(--text-muted);
+  }
+
+  .seasons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--grid-gap);
+  }
+
+  .season {
+    padding-block-start: var(--space-xs);
+    border-block-start: 3px solid var(--color-rule);
+  }
+
+  .season.is-today {
+    border-block-start-color: var(--color-leaf);
+  }
+
+  .season h3 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-xs);
+    margin-block-end: var(--space-2xs);
+    color: var(--color-fir);
+  }
+
+  .today {
+    color: var(--color-moss);
+    font-family: var(--font-ui);
+    font-size: var(--step--1);
+    font-weight: 700;
+  }
+
+  .months {
+    margin-block-end: var(--space-xs);
+    color: var(--text-muted);
+    font-size: var(--step--1);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding-block: var(--space-2xs);
+    border-block-end: 1px solid var(--color-rule);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  th {
+    padding-inline-end: var(--space-s);
+    font-family: var(--font-ui);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+</style>
