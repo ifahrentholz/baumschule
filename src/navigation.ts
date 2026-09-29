@@ -7,8 +7,8 @@
  * turns them into links for the current deploy target. The grouping, not the
  * URL, decides where a page sits: `/karriere/` belongs to "Über uns".
  *
- * Seasonal offers (`/saison/<slug>/`) are not listed: they only exist while
- * an offer is in its window and are linked from the home page.
+ * Seasonal offers (`/saison/<slug>/`) are not listed: they only show an
+ * offer while it is in its window and are linked from the home page then.
  */
 export interface NavItem {
   label: string;

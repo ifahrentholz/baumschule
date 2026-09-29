@@ -1,0 +1,63 @@
+---
+// One page per seasonal offer (Seasonal offers collection,
+// `src/seasonal-offers.ts`). The page exists all year, so a bookmark, a
+// shared link or a home page link shown after the last build never ends in
+// a 404; the offer itself only shows inside its yearly window (AC-5).
+// Outside it, the page says when the offer comes back and links the home
+// page. The build sets that state for its own date, the shared client script
+// (`VisibilityWindows.astro`) for the visitor's.
+import type { GetStaticPaths } from "astro";
+import { Image } from "astro:assets";
+import VisibilityWindows from "../../components/VisibilityWindows.astro";
+import PageShell from "../../layouts/PageShell.astro";
+import { withBase } from "../../navigation";
+import { berlinClock } from "../../opening-hours";
+import { loadSeasonalOffers } from "../../seasonal-offer-entries";
+import { windowText } from "../../seasonal-offers";
+import { isWithinWindow } from "../../visibility";
+
+export const getStaticPaths = (() =>
+  loadSeasonalOffers().map((entry) => ({
+    params: { slug: entry.offer.slug },
+    props: { entry },
+  }))) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+const { offer, Content, image } = entry;
+const base = import.meta.env.BASE_URL;
+const inWindow = isWithinWindow(offer.window, berlinClock(new Date()).date);
+const windowData = JSON.stringify(offer.window);
+---
+
+<PageShell
+  path={`/saison/${offer.slug}/`}
+  heading={offer.title}
+  lead={`Jedes Jahr vom ${windowText(offer)}`}
+>
+  <div data-window={windowData} hidden={!inWindow}>
+    {image && (
+      <Image
+        class="offer-image"
+        src={image}
+        alt=""
+        widths={[480, 800, 1200]}
+        sizes="(min-width: 64rem) 40rem, 100vw"
+      />
+    )}
+    <Content />
+  </div>
+  <p data-outside-window={windowData} hidden={inWindow}>
+    Dieses Saisonangebot gibt es gerade nicht. Wir haben es jedes Jahr vom{" "}
+    {windowText(offer)}. <a href={withBase(base, "/")}>Zur Startseite</a>
+  </p>
+  <VisibilityWindows />
+</PageShell>
+
+<style>
+  .offer-image {
+    width: 100%;
+    height: auto;
+    margin-block-end: var(--space-m);
+    border-radius: var(--radius);
+  }
+</style>

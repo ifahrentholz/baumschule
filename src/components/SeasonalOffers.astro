@@ -1,0 +1,79 @@
+---
+// The home page's links to the seasonal offers (Seasonal offers collection,
+// `src/seasonal-offers.ts`), in place of the old Apfelsaft popup. A link only
+// shows while its offer is in its yearly window (AC-5): hidden by the build
+// for its own date, then kept current by the shared client script
+// (`VisibilityWindows.astro`). Every offer's page exists all year
+// (`src/pages/saison/[slug].astro`), so a link shown by the script never
+// leads to a missing page.
+import { berlinClock } from "../opening-hours";
+import { loadSeasonalOffers } from "../seasonal-offer-entries";
+import { windowText } from "../seasonal-offers";
+import { withBase } from "../navigation";
+import { isWithinWindow } from "../visibility";
+import VisibilityWindows from "./VisibilityWindows.astro";
+
+const base = import.meta.env.BASE_URL;
+const buildDate = berlinClock(new Date()).date;
+const offers = loadSeasonalOffers().map(({ offer }) => offer);
+const anyVisible = offers.some((offer) =>
+  isWithinWindow(offer.window, buildDate),
+);
+---
+
+{offers.length > 0 && (
+  <section
+    class="seasonal-offers"
+    aria-labelledby="saisonangebote"
+    data-window-group
+    hidden={!anyVisible}
+  >
+    <h2 id="saisonangebote">Saisonangebote</h2>
+    <ul>
+      {offers.map((offer) => (
+        <li
+          data-window={JSON.stringify(offer.window)}
+          hidden={!isWithinWindow(offer.window, buildDate)}
+        >
+          <a href={withBase(base, `/saison/${offer.slug}/`)}>{offer.title}</a>
+          <span class="window">{windowText(offer)}</span>
+        </li>
+      ))}
+    </ul>
+    <VisibilityWindows />
+  </section>
+)}
+
+<style>
+  .seasonal-offers {
+    padding-block-end: var(--space-l);
+  }
+
+  .seasonal-offers ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--grid-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .seasonal-offers li {
+    padding-block-start: var(--space-xs);
+    border-block-start: 3px solid var(--color-leaf);
+  }
+
+  .seasonal-offers a {
+    display: block;
+    color: var(--color-fir);
+    font-size: var(--step-2);
+    font-weight: 700;
+    line-height: var(--leading-tight);
+  }
+
+  .window {
+    color: var(--text-muted);
+    font-family: var(--font-ui);
+    font-size: var(--step--1);
+  }
+</style>

@@ -1,0 +1,48 @@
+---
+// Client side of the visibility window rule (AC-5, `src/visibility.ts`).
+// Render it once in any component that marks elements up with a window;
+// Astro bundles the script once per page however often it appears.
+//
+// - `data-window` (a `VisibilityWindow` as JSON): shown only inside it.
+// - `data-outside-window` (same format): shown only outside it, e.g. the
+//   "not available right now" text of a seasonal offer page.
+// - `data-window-group`: hidden when none of its `data-window` elements show,
+//   so an empty section does not leave its heading behind.
+//
+// The build already sets `hidden` for its own date; this script re-applies
+// the rule with the visitor's Berlin date on load and every minute, so an
+// entry appears and disappears at midnight in Berlin without a rebuild.
+---
+
+<script>
+  import { berlinClock } from "../opening-hours";
+  import { isWithinWindow, type VisibilityWindow } from "../visibility";
+
+  function inside(value: string | undefined, today: string): boolean {
+    return isWithinWindow(JSON.parse(value ?? "") as VisibilityWindow, today);
+  }
+
+  function update(): void {
+    const today = berlinClock(new Date()).date;
+    for (const element of document.querySelectorAll<HTMLElement>(
+      "[data-window]",
+    )) {
+      element.hidden = !inside(element.dataset.window, today);
+    }
+    for (const element of document.querySelectorAll<HTMLElement>(
+      "[data-outside-window]",
+    )) {
+      element.hidden = inside(element.dataset.outsideWindow, today);
+    }
+    for (const group of document.querySelectorAll<HTMLElement>(
+      "[data-window-group]",
+    )) {
+      group.hidden = ![
+        ...group.querySelectorAll<HTMLElement>("[data-window]"),
+      ].some((element) => !element.hidden);
+    }
+  }
+
+  update();
+  setInterval(update, 60_000);
+</script>

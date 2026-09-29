@@ -1,0 +1,85 @@
+---
+// The home page's notices (Notices collection, `src/notices.ts`), in place of
+// the old "Zeile 00" posts. Only notices inside their window show (AC-5):
+// the build leaves out those already over and hides those not yet due; the
+// shared client script hides and shows them as the date moves on
+// (`VisibilityWindows.astro`).
+import { berlinClock } from "../opening-hours";
+import { noticeHref, parseNotices } from "../notices";
+import { isWindowOver, isWithinWindow } from "../visibility";
+import VisibilityWindows from "./VisibilityWindows.astro";
+
+const files = import.meta.glob("/src/content/notices/*.json", {
+  eager: true,
+  import: "default",
+});
+const base = import.meta.env.BASE_URL;
+const buildDate = berlinClock(new Date()).date;
+const notices = parseNotices(files).filter(
+  (notice) => !isWindowOver(notice.window, buildDate),
+);
+const anyVisible = notices.some((notice) =>
+  isWithinWindow(notice.window, buildDate),
+);
+---
+
+{notices.length > 0 && (
+  <section
+    class="notices"
+    aria-label="Aktuelle Hinweise"
+    data-window-group
+    hidden={!anyVisible}
+  >
+    <ul class="frame">
+      {notices.map((notice) => (
+        <li
+          data-window={JSON.stringify(notice.window)}
+          hidden={!isWithinWindow(notice.window, buildDate)}
+        >
+          <span>{notice.text}</span>
+          {notice.link && (
+            <a href={noticeHref(notice.link, base)}>Mehr erfahren</a>
+          )}
+        </li>
+      ))}
+    </ul>
+    <VisibilityWindows />
+  </section>
+)}
+
+<style>
+  .notices {
+    background: var(--surface-alt);
+    border-block-end: 1px solid var(--color-rule);
+    font-family: var(--font-ui);
+  }
+
+  .notices ul {
+    margin-block: 0;
+    padding-block: var(--space-s);
+    list-style: none;
+  }
+
+  .notices li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-s);
+    padding-block: var(--space-2xs);
+    padding-inline-start: var(--space-s);
+    border-inline-start: 3px solid var(--color-claim);
+    font-weight: 700;
+  }
+
+  /* `display: flex` above would otherwise override the `hidden` attribute. */
+  .notices li[hidden] {
+    display: none;
+  }
+
+  .notices li + li {
+    margin-block-start: var(--space-xs);
+  }
+
+  .notices a {
+    font-weight: 500;
+  }
+</style>
