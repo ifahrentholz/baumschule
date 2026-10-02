@@ -42,6 +42,24 @@ export const NOTICES_FOLDER = "src/content/notices";
  */
 export const SEASONAL_OFFERS_FOLDER = "src/content/seasonal-offers";
 
+/**
+ * Repository folder of the Assortment categories collection, one Markdown
+ * file per category, read by `src/assortment-entries.ts`.
+ */
+export const ASSORTMENT_FOLDER = "src/content/assortment";
+
+/**
+ * Repository folder of the Cultivar tables collection, one JSON file per
+ * table, read by `src/assortment-entries.ts`.
+ */
+export const CULTIVAR_TABLES_FOLDER = "src/content/cultivar-tables";
+
+/**
+ * Repository path of the Assortment singleton (the online catalogue link),
+ * read by `src/assortment-entries.ts`.
+ */
+export const ASSORTMENT_FILE = "src/content/assortment.json";
+
 const MONTH_OPTIONS = MONTH_LABELS.map((label, i) => ({
   label,
   value: i + 1,
@@ -210,6 +228,146 @@ const SEASONAL_OFFERS: EntryCollection = {
   ],
 };
 
+const ASSORTMENT_CATEGORIES: EntryCollection = {
+  name: "assortment_categories",
+  label: "Sortiment",
+  label_singular: "Sortimentsbereich",
+  description:
+    "Die sieben Sortimentsbereiche (Laubgehölze, Obstgehölze, …). Jeder hat eine eigene Seite unter /sortiment/<Kurzname>/; die Reihenfolge bestimmt die Übersicht /sortiment/. Sortentabellen werden unter „Sortentabellen“ gepflegt.",
+  folder: ASSORTMENT_FOLDER,
+  extension: "md",
+  format: "yaml-frontmatter",
+  // The seven categories are fixed by the page tree (`src/navigation.ts`),
+  // and the file name is the page's slug, which cultivar tables refer to.
+  // Editors change their content only: no adding, deleting or duplicating,
+  // so no CMS save can break a navigation link or orphan a table.
+  create: false,
+  delete: false,
+  duplicate: false,
+  fields: [
+    { name: "title", label: "Titel" },
+    {
+      name: "order",
+      label: "Reihenfolge",
+      widget: "number",
+      value_type: "int",
+      required: false,
+      hint: "Kleinere Zahlen stehen in der Übersicht weiter vorn.",
+    },
+    {
+      name: "teaser",
+      label: "Teaser-Text",
+      widget: "text",
+      required: false,
+    },
+    {
+      name: "teaser_image",
+      label: "Teaser-Bild",
+      widget: "image",
+      required: false,
+    },
+    { name: "body", label: "Text", widget: "markdown", required: false },
+    {
+      name: "subgroups",
+      label: "Untergruppen",
+      label_singular: "Untergruppe",
+      widget: "list",
+      required: false,
+      summary: "{{fields.title}}",
+      fields: [
+        { name: "title", label: "Titel" },
+        { name: "text", label: "Text", widget: "text", required: false },
+      ],
+    },
+    {
+      name: "gallery",
+      label: "Bildergalerie",
+      label_singular: "Bild",
+      widget: "list",
+      required: false,
+      fields: [
+        { name: "image", label: "Bild", widget: "image" },
+        {
+          name: "alt",
+          label: "Bildbeschreibung",
+          required: false,
+          hint: "Was auf dem Bild zu sehen ist, für Menschen, die es nicht sehen können.",
+        },
+      ],
+    },
+  ],
+};
+
+const CULTIVAR_TABLES: EntryCollection = {
+  name: "cultivar_tables",
+  label: "Sortentabellen",
+  label_singular: "Sortentabelle",
+  description:
+    "Sortentabellen wie „Apfel-Sortiment“ oder „Befruchtungstabelle Äpfel“. Jede gehört zu einem Sortimentsbereich und erscheint auf dessen Seite. Die Spalten sind frei wählbar (z. B. Sorte, Reife, Befruchter, Geschmack); jede Zeile hat eine Zelle je Spalte, in derselben Reihenfolge.",
+  folder: CULTIVAR_TABLES_FOLDER,
+  extension: "json",
+  format: "json",
+  slug: "{{title}}",
+  summary: "{{fields.title}}",
+  fields: [
+    { name: "title", label: "Titel" },
+    {
+      name: "category",
+      label: "Sortimentsbereich",
+      widget: "relation",
+      collection: "assortment_categories",
+      value_field: "{{slug}}",
+      search_fields: ["title"],
+      display_fields: ["title"],
+    },
+    {
+      name: "order",
+      label: "Reihenfolge",
+      widget: "number",
+      value_type: "int",
+      required: false,
+      hint: "Kleinere Zahlen stehen auf der Seite weiter oben.",
+    },
+    {
+      name: "group",
+      label: "Gruppe",
+      required: false,
+      hint: "Zwischenüberschrift auf der Seite, z. B. „Äpfel“. Aufeinanderfolgende Tabellen mit derselben Gruppe stehen unter einer Überschrift.",
+    },
+    {
+      name: "intro",
+      label: "Einleitung",
+      widget: "text",
+      required: false,
+      hint: "Text über der Tabelle; Leerzeilen trennen Absätze.",
+    },
+    {
+      name: "columns",
+      label: "Spalten",
+      label_singular: "Spalte",
+      widget: "list",
+      field: { name: "column", label: "Spaltenüberschrift" },
+    },
+    {
+      name: "rows",
+      label: "Zeilen",
+      label_singular: "Zeile",
+      widget: "list",
+      required: false,
+      fields: [
+        {
+          name: "cells",
+          label: "Zellen",
+          label_singular: "Zelle",
+          widget: "list",
+          hint: "Eine Zelle je Spalte, in der Reihenfolge der Spalten.",
+          field: { name: "cell", label: "Inhalt", required: false },
+        },
+      ],
+    },
+  ],
+};
+
 export interface CmsConfigOptions {
   /** Absolute URL of the site's home page, including the base path. */
   siteUrl: string;
@@ -231,7 +389,12 @@ export function createCmsConfig({ siteUrl }: CmsConfigOptions): CmsConfig {
     publish_mode: "simple",
     media_folder: IMAGE_FOLDER,
     public_folder: `/${IMAGE_FOLDER}`,
-    collections: [NOTICES, SEASONAL_OFFERS],
+    collections: [
+      NOTICES,
+      SEASONAL_OFFERS,
+      ASSORTMENT_CATEGORIES,
+      CULTIVAR_TABLES,
+    ],
     singletons: [
       {
         name: "settings",
@@ -266,6 +429,21 @@ export function createCmsConfig({ siteUrl }: CmsConfigOptions): CmsConfig {
           { name: "email", label: "E-Mail", required: false },
           { name: "vat_id", label: "USt-IdNr.", required: false },
           { name: "logo", label: "Logo", widget: "image" },
+        ],
+      },
+      {
+        name: "assortment",
+        label: "Sortiment: Online-Katalog",
+        file: ASSORTMENT_FILE,
+        format: "json",
+        fields: [
+          {
+            name: "catalogue_url",
+            label: "Adresse des Online-Katalogs (gartenmedien)",
+            required: false,
+            hint: "Vollständige Adresse (https://…). Die Übersicht /sortiment/ verlinkt den Katalog; ohne Adresse entfällt der Link.",
+            pattern: ["^https://", "Mit https:// beginnen"],
+          },
         ],
       },
       {

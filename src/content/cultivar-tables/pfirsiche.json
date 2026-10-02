@@ -1,0 +1,67 @@
+{
+  "title": "Pfirsiche",
+  "category": "obstgehoelze",
+  "order": 5,
+  "group": "Pfirsiche und Aprikosen",
+  "intro": "Der Pfirsich stammt aus dem asiatischen Raum (Mittel- und Nordchina). Über den vorderen Orient gelangte er in die Mittelmeerländer und von dort durch die Römer in unser Gebiet. Der Pfirsich ist sehr wärmebedürftig. Im Hausgarten sollte er daher an möglichst windgeschützten Stellen stehen. Empfindlich reagiert er gegenüber anhaltenden tiefen Temperaturen, Spätfrösten, stauender Nässe und extremer Trockenheit, insbesondere kurz vor der Reife. Die meisten Pfirsich-Sorten sind selbstfruchtbar, können also mit eigenem Pollen bestäubt Früchte hervorbringen. Bei Fremdbefruchtung ist jedoch, besonders bei schlechtem Wetter während der Blüte, ein höherer Ernteertrag zu beobachten.",
+  "columns": [
+    "Pfirsich – Sorte",
+    "Reifezeit"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Früher Roter Ingelheimer (Fruchtfleisch weißlich-gelb)",
+        "Mitte – Ende Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Amsden",
+        "Mitte – Ende Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Cumberland (weißfleischig)",
+        "Mitte August"
+      ]
+    },
+    {
+      "cells": [
+        "Red Haven (gelbfleischig)",
+        "Mitte – Ende August"
+      ]
+    },
+    {
+      "cells": [
+        "Anneliese Rudolph (weißfleischig)",
+        "Mitte – Ende August"
+      ]
+    },
+    {
+      "cells": [
+        "South Haven",
+        "Ende August"
+      ]
+    },
+    {
+      "cells": [
+        "Rekord aus Alfter (Fruchtfleisch gelblich-weiß)",
+        "Ende August – Anfang September"
+      ]
+    },
+    {
+      "cells": [
+        "Roter Ellerstädter (syn.: Kernechter vom Vorgebirge) (weißfleischig)",
+        "Mitte – Ende September"
+      ]
+    },
+    {
+      "cells": [
+        "Revita Neuheit! (unempfindlicher gegenüber der Kräuselkrankheit )",
+        "Mitte – Ende August"
+      ]
+    }
+  ]
+}

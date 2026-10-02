@@ -1,0 +1,30 @@
+{
+  "title": "Stachelbeeren",
+  "category": "obstgehoelze",
+  "order": 19,
+  "group": "Stachelbeeren",
+  "columns": [
+    "Name",
+    "Frucht",
+    "Geschmack",
+    "Genußreife"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Hönings Früheste",
+        "klein- mittel, gelb",
+        "süßsäuerlich",
+        "E. Juni – A. Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Weiße Neckartal",
+        "Mittelgroß, gelb",
+        "angenehm süßsäuerlich",
+        "A.- M. Juli"
+      ]
+    }
+  ]
+}

@@ -1,17 +1,106 @@
 ---
-// One shell per assortment category; the categories come from the
-// navigation tree until the content collection (#5 onwards) takes over.
+// One page per assortment category (Assortment categories collection,
+// `src/assortment.ts`): body, sub-groups, gallery and the category's
+// cultivar tables. A category without any content yet shows the shell's
+// "being rebuilt" notice.
 import type { GetStaticPaths } from "astro";
+import { Image } from "astro:assets";
+import { groupTables, paragraphs } from "../../assortment";
+import { loadAssortment } from "../../assortment-entries";
+import CultivarTable from "../../components/CultivarTable.astro";
 import PageShell from "../../layouts/PageShell.astro";
-import { ASSORTMENT_CATEGORIES } from "../../navigation";
 
 export const getStaticPaths = (() =>
-  ASSORTMENT_CATEGORIES.map(({ path }) => ({
-    params: { slug: path.split("/").at(-2) },
-    props: { path },
+  loadAssortment().map((entry) => ({
+    params: { slug: entry.category.slug },
+    props: { entry },
   }))) satisfies GetStaticPaths;
 
-const { path } = Astro.props;
+const { entry } = Astro.props;
+const { category, Content, hasBody, gallery, tables } = entry;
+const path = `/sortiment/${category.slug}/`;
+const isEmpty =
+  !hasBody &&
+  category.subgroups.length === 0 &&
+  gallery.length === 0 &&
+  tables.length === 0;
 ---
 
-<PageShell path={path} />
+{isEmpty ? (
+  <PageShell path={path} heading={category.title} lead={category.teaser} />
+) : (
+  <PageShell path={path} heading={category.title} lead={category.teaser}>
+    {hasBody && <Content />}
+
+    {category.subgroups.map((group) => (
+      <section class="subgroup">
+        <h2>{group.title}</h2>
+        {paragraphs(group.text).map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+      </section>
+    ))}
+
+    {gallery.length > 0 && (
+      <ul class="gallery" aria-label={`Bilder: ${category.title}`}>
+        {gallery.map(({ image, alt }) => (
+          <li>
+            <Image
+              src={image}
+              alt={alt}
+              widths={[320, 640, 960]}
+              sizes="(min-width: 40rem) 20rem, 100vw"
+            />
+          </li>
+        ))}
+      </ul>
+    )}
+
+    {tables.length > 0 && (
+      <section class="cultivar-tables" aria-labelledby="sortentabellen">
+        <h2 id="sortentabellen">Sortentabellen</h2>
+        {groupTables(tables).map((run) =>
+          run.group === undefined ? (
+            run.tables.map((table) => <CultivarTable table={table} />)
+          ) : (
+            <section class="table-group">
+              <h3>{run.group}</h3>
+              {run.tables.map((table) => (
+                <CultivarTable table={table} level={4} />
+              ))}
+            </section>
+          ),
+        )}
+      </section>
+    )}
+  </PageShell>
+)}
+
+<style>
+  .subgroup {
+    margin-block-start: var(--space-l);
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    gap: var(--space-s);
+    margin-block: var(--space-l);
+    padding: 0;
+    list-style: none;
+  }
+
+  .gallery :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+  }
+
+  .cultivar-tables {
+    margin-block-start: var(--space-xl);
+  }
+
+  .table-group {
+    margin-block-start: var(--space-l);
+  }
+</style>

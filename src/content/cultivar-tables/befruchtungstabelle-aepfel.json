@@ -1,0 +1,210 @@
+{
+  "title": "Befruchtungstabelle für Äpfel",
+  "category": "obstgehoelze",
+  "order": 2,
+  "group": "Äpfel",
+  "columns": [
+    "Sorte",
+    "Befruchtersorte"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Alkmene",
+        "Cox Orange, Goldparmäne, James Grieve"
+      ]
+    },
+    {
+      "cells": [
+        "Ananasrenette",
+        "Cox Orange, Goldparmäne"
+      ]
+    },
+    {
+      "cells": [
+        "Berlepsch",
+        "Cox Orange, James Grieve"
+      ]
+    },
+    {
+      "cells": [
+        "Boskoop",
+        "Alkmene, Berlepsch, Cox Orange, Gloster, Goldparmäne, Idared, James Grieve"
+      ]
+    },
+    {
+      "cells": [
+        "Brettacher",
+        "Elstar, Gloster, Goldparmäne"
+      ]
+    },
+    {
+      "cells": [
+        "Cox Orange",
+        "Alkmene, Berlepsch, Elstar, Golden Delicious, Goldparmäne, James Grieve"
+      ]
+    },
+    {
+      "cells": [
+        "Elstar",
+        "Cox Orange, Gloster, James Grieve, Melrose"
+      ]
+    },
+    {
+      "cells": [
+        "Geheimrat Oldenburg",
+        "Cox Orange, James Grieve, Weißer Klarapfel"
+      ]
+    },
+    {
+      "cells": [
+        "Gloster",
+        "Cox Orange, Golden Delicious, Idared"
+      ]
+    },
+    {
+      "cells": [
+        "Golden Delicious",
+        "Cox Orange, Elstar, Gloster, Goldparmäne, James Grieve"
+      ]
+    },
+    {
+      "cells": [
+        "Goldparmäne",
+        "Alkmene, Berlepsch, Cox Orange, Weißer Klarapfel"
+      ]
+    },
+    {
+      "cells": [
+        "Gravensteiner",
+        "Berlepsch, Cox Orange, Goldparmäne, James Grieve, Weißer Klarapfel"
+      ]
+    },
+    {
+      "cells": [
+        "Idared",
+        "Berlepsch, Golden Delicious, Goldparmäne, James Grieve"
+      ]
+    },
+    {
+      "cells": [
+        "Ingrid Marie",
+        "Cox Orange, Golden Delicious, Goldparmäne, James Grieve"
+      ]
+    },
+    {
+      "cells": [
+        "Jakob Lebel",
+        "Cox Orange, Ingrid Marie, Ontarioapfel"
+      ]
+    },
+    {
+      "cells": [
+        "Jamba",
+        "Alkmene, Cox Orange, Ingrid Marie, James Grieve, Weißer Klarapfel"
+      ]
+    },
+    {
+      "cells": [
+        "James Grieve",
+        "Alkmene, Cox Orange, Berlepsch, Goldparmäne, Idared"
+      ]
+    },
+    {
+      "cells": [
+        "Jonagold",
+        "Cox Orange, Elstar, Gloste, James Grieve"
+      ]
+    },
+    {
+      "cells": [
+        "Jonathan",
+        "Berlepsch, Cox Orange, Golden Delicious, Goldparmäne"
+      ]
+    },
+    {
+      "cells": [
+        "Landsberger Renette",
+        "Alkmene, Cox Orange, Goldparmäne, James Grieve, Weißer Klarapfel"
+      ]
+    },
+    {
+      "cells": [
+        "Melrose",
+        "Alkmene, Cox Orange, Elstar, Gloster, Golden Delicious, James Grieve"
+      ]
+    },
+    {
+      "cells": [
+        "Ontarioapfel",
+        "Cox Orange, Geheimrat Oldenburg, Gloster, Goldparmäne, Jamba, James Grieve, Melrose"
+      ]
+    },
+    {
+      "cells": [
+        "Prinzenapfel",
+        "Schöner von Herrenhut Alkmene, Ingrid Marie"
+      ]
+    },
+    {
+      "cells": [
+        "Starking Earliest",
+        "Golden Delicious, Goldparmäne, Idared"
+      ]
+    },
+    {
+      "cells": [
+        "Weißer Klarapfel",
+        "Alkmene, Cox Orange, Geheimrat Oldenburg, Goldparmäne, James Grieve"
+      ]
+    },
+    {
+      "cells": [
+        "Pi und Re-Sorten:",
+        ""
+      ]
+    },
+    {
+      "cells": [
+        "Pilot",
+        "Golden Delicious, Melrose, Elstar, Gloster, Idared, Remo, Rewena, Pinova"
+      ]
+    },
+    {
+      "cells": [
+        "Pinova",
+        "Elstar, Gloster, Golden Delicious, Idared, James Grieve, Melrose, Pilot"
+      ]
+    },
+    {
+      "cells": [
+        "Piros",
+        "Golden Delicious, Melrose, Idared, James Grieve, Pinova"
+      ]
+    },
+    {
+      "cells": [
+        "Reglindis",
+        "James Grieve, Piros, Remo, Retina, Rewena"
+      ]
+    },
+    {
+      "cells": [
+        "Remo",
+        "Rewena, Golden Delicious, Idared, James Grieve, Pilot, Piros"
+      ]
+    },
+    {
+      "cells": [
+        "Retina",
+        "Goldparmäne, Idared, James Grieve"
+      ]
+    },
+    {
+      "cells": [
+        "Rewena",
+        "Remo, Golden Delicious, Idared, James Grieve, Pilot"
+      ]
+    }
+  ]
+}

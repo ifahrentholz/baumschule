@@ -1,0 +1,84 @@
+{
+  "title": "Befruchtungstabelle für Birnen",
+  "category": "obstgehoelze",
+  "order": 4,
+  "group": "Birnen",
+  "columns": [
+    "Sorte",
+    "Befruchtersorte"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Alexander Lucas",
+        "Clapps Liebling, Conference, Gute Luise, Williams Christbirne"
+      ]
+    },
+    {
+      "cells": [
+        "Bosc Flaschenbirne",
+        "Clapps Liebling, Conference, Köstliche aus Charneu, Vereinsdechantsbirne, Williams Christbirne"
+      ]
+    },
+    {
+      "cells": [
+        "Clapps Liebling",
+        "Bosc Flaschenbirne, Gräfin von Paris, Gute Luise, Köstliche aus Charneu, Williams Christbirne"
+      ]
+    },
+    {
+      "cells": [
+        "Conference",
+        "Bosc Flaschenbirne, Gute Luise, Williams Christbirne, Köstliche aus Charneu, Vereinsdechantsbirne"
+      ]
+    },
+    {
+      "cells": [
+        "Gellerts Butterbirne",
+        "Clapps Liebling, Gute Luise, Madame Verte´, Köstliche aus Charneu, Vereinsdechantsbirne, Williams Christbirne"
+      ]
+    },
+    {
+      "cells": [
+        "Gräfin von Paris",
+        "Bosc Flaschenbirne, Clapps Liebling, Gellerts Butterbirne, Köstliche aus Charneu, Madame Verte´, Williams Christbirne"
+      ]
+    },
+    {
+      "cells": [
+        "Gute Luise",
+        "Clapps Liebling, Conference, Köstliche aus Charneu, Vereinsdechantsbirne"
+      ]
+    },
+    {
+      "cells": [
+        "Köstliche aus Charneu",
+        "Bosc Flaschenbirne, Gellerts Butterbirne, Gräfin von Paris, Gute Luise, Williams Christbirne"
+      ]
+    },
+    {
+      "cells": [
+        "Madame Verte´",
+        "Bosc Flaschenbirne, Gellerts Butterbirne, Gräfin von Paris, Köstliche aus Charneu, Vereinsdechantsbirne, Williams Christbirne"
+      ]
+    },
+    {
+      "cells": [
+        "Triumph aus Vienne",
+        "Clapps Liebling, Gräfin von Paris, Gute Luise, Madame Verte´, Williams Christbirne"
+      ]
+    },
+    {
+      "cells": [
+        "Vereinsdechantsbirne",
+        "Bosc Flaschenbirne, Clapps Liebling, Conference, Gellerts Butterbirne, Köstliche aus Charneu, Williams Christbirne"
+      ]
+    },
+    {
+      "cells": [
+        "Williams Christbirne",
+        "Clapps Liebling, Gellerts Butterbirne, Gräfin von Paris, Köstliche aus Charneu, Vereinsdechantsbirne"
+      ]
+    }
+  ]
+}

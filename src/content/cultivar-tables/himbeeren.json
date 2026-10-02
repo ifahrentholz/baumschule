@@ -1,0 +1,62 @@
+{
+  "title": "Himbeeren",
+  "category": "obstgehoelze",
+  "order": 12,
+  "group": "Himbeeren & Brombeeren",
+  "columns": [
+    "Name",
+    "Allgemeine Angaben",
+    "Genußreife"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Autumn Bliss",
+        "reichtragend gesunde Sorte, feine Säure",
+        "A, August- Frosteintritt"
+      ]
+    },
+    {
+      "cells": [
+        "Elida",
+        "groß, sehr früh",
+        "M. Juni-M.Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Korbfüller",
+        "groß, aromatisch",
+        "Juni- Frosteintritt"
+      ]
+    },
+    {
+      "cells": [
+        "Meeker",
+        "mittel- groß, sehr aromatisch",
+        "A.Juli- E. Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Rubacca",
+        "mittel- groß, regelmäßig hoher Ertrag, widerstandsfähig gegen das Wurzelsterben",
+        "A. Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Schönemanns",
+        "Großfrüchtig, regelmäßig hoher Ertrag",
+        "M.Juni- M.Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Fallgold",
+        "mittelgroß, robust, gelbe Sorte",
+        "Juli – September"
+      ]
+    }
+  ]
+}

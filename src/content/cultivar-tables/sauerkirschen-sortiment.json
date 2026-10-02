@@ -1,0 +1,42 @@
+{
+  "title": "Sauerkirschen-Sortiment",
+  "category": "obstgehoelze",
+  "order": 8,
+  "group": "Sauerkirschen",
+  "intro": "Die heutigen Sauerkirschen-Sorten gehen auf Wildformen der Sauerkirsche zurück, die ihr ursprüngliches Verbreitungsgebiet in Kleinasien hatten. Die Standortansprüche der meisten Sauerkirschen sind geringer als die der Süßkirschen. Bei den Sauerkirschen gibt es neben selbstunfruchtbaren Sorten auch selbstfruchtende Sorten.",
+  "columns": [
+    "Sauerkirsch – Sorte",
+    "Befruchtungssorte",
+    "Genußreife"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Morellenfeuer",
+        "selbstfruchtbar",
+        "Mitte – Ende Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Koröser Weichsel",
+        "Schattenmorelle, Morellenfeuer",
+        "Mitte – Ende Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Schattenmorelle",
+        "selbstfruchtbar",
+        "Ende Juli – Anf. August"
+      ]
+    },
+    {
+      "cells": [
+        "Schöne aus Chatenay",
+        "Schattenmorelle, Morellenfeuer",
+        "Ende Juli – Mitte August"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "title": "Neuere Sorten",
+  "category": "obstgehoelze",
+  "order": 17,
+  "group": "Johannisbeeren",
+  "columns": [
+    "Name",
+    "Frucht",
+    "Geschmack",
+    "Genußreife"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Rondom",
+        "mittelgroß, rot",
+        "säuerlich- mild, hoher Ertrag",
+        "Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Rotet",
+        "groß, lange Trauben, rot",
+        "säuerlich, aromatisch",
+        "E. Juni- Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Rovada",
+        "groß, lange bis sehr lange Trauben, rot",
+        "intensives Aroma",
+        "E.Juli- Sept."
+      ]
+    },
+    {
+      "cells": [
+        "Ometa",
+        "mittelgroß, lange Trauben, schwarz",
+        "süß, sehr aromatisch",
+        "M. Juni"
+      ]
+    },
+    {
+      "cells": [
+        "Titania",
+        "sehr groß, schwarz",
+        "fest, sehr aromatisch",
+        "A.-M. Juli"
+      ]
+    }
+  ]
+}

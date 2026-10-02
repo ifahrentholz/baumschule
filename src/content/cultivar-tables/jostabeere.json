@@ -1,0 +1,22 @@
+{
+  "title": "Kreuzung zwischen Johannisbeere und Stachelbeere",
+  "category": "obstgehoelze",
+  "order": 18,
+  "group": "Johannisbeeren",
+  "columns": [
+    "Name",
+    "Frucht",
+    "Geschmack",
+    "Genußreife"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Josta",
+        "mittel bis groß, schwarz",
+        "aromatisch",
+        "A.- M. Juli"
+      ]
+    }
+  ]
+}

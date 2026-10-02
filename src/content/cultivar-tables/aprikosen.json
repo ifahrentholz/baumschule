@@ -1,0 +1,43 @@
+{
+  "title": "Aprikosen",
+  "category": "obstgehoelze",
+  "order": 6,
+  "group": "Pfirsiche und Aprikosen",
+  "intro": "Die Aprikose stammt ursprünglich aus Zentralasien, wird aber bereits seit Jahrtausenden in Europa kultiviert. Sie stellt unter unseren Klimabedingungen gewisse Ansprüche. Ihre frühe Blüte ist durch Spätfröste gefährdet. Im Holz ist sie wiederum sehr frosthart. Als Standorte eignen sich windgeschützte Lagen mit lockeren lehmhaltigen und ausreichend feuchten Böden. Aprikosen sind selbstfruchtbar, d.h. eine Aprikosen-Sorte braucht zum Fruchtansatz keine andere Sorte, die sie bestäubt.",
+  "columns": [
+    "Sorte",
+    "Reifezeit"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Orangered",
+        "Anfang Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Große Wahre Frühaprikose",
+        "Ende Juli – Anfang August"
+      ]
+    },
+    {
+      "cells": [
+        "Marena",
+        "Ende Juli – Mitte August"
+      ]
+    },
+    {
+      "cells": [
+        "Ungarische Beste",
+        "Mitte August"
+      ]
+    },
+    {
+      "cells": [
+        "Aprikose von Nancy",
+        "Mitte August"
+      ]
+    }
+  ]
+}

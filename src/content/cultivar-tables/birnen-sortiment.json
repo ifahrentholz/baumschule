@@ -1,0 +1,84 @@
+{
+  "title": "Birnen – Sortiment",
+  "category": "obstgehoelze",
+  "order": 3,
+  "group": "Birnen",
+  "columns": [
+    "Sorte",
+    "Genußreife in Monaten"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Alexander Lucas",
+        "11.-12."
+      ]
+    },
+    {
+      "cells": [
+        "Bosc Flaschenbirne",
+        "10.-11."
+      ]
+    },
+    {
+      "cells": [
+        "Clapps Liebling",
+        "8.-9."
+      ]
+    },
+    {
+      "cells": [
+        "Conference",
+        "9.-11."
+      ]
+    },
+    {
+      "cells": [
+        "Gellerts Butterbirne",
+        "9.-10."
+      ]
+    },
+    {
+      "cells": [
+        "Gräfin von Paris",
+        "11.-1."
+      ]
+    },
+    {
+      "cells": [
+        "Gute Luise",
+        "9.-10."
+      ]
+    },
+    {
+      "cells": [
+        "Köstliche aus Charneu",
+        "10.-11."
+      ]
+    },
+    {
+      "cells": [
+        "Madame Verte",
+        "12.-1."
+      ]
+    },
+    {
+      "cells": [
+        "Triumph aus Vienne",
+        "9."
+      ]
+    },
+    {
+      "cells": [
+        "Vereinsdechantsbirne",
+        "10.-11."
+      ]
+    },
+    {
+      "cells": [
+        "Williams Christbirne",
+        "9."
+      ]
+    }
+  ]
+}

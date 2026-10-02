@@ -1,0 +1,46 @@
+{
+  "title": "Johannisbeeren",
+  "category": "obstgehoelze",
+  "order": 16,
+  "group": "Johannisbeeren",
+  "columns": [
+    "Name",
+    "Frucht",
+    "Geschmack",
+    "Genußreife"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Heinemann’s Späthlese",
+        "mittel- bis groß, sehr lange Trauben, rot",
+        "aromatisch",
+        "A. Aug.- Sept."
+      ]
+    },
+    {
+      "cells": [
+        "Heros",
+        "lange Trauben, rot",
+        "sauer, aromatisch",
+        "Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Jonkheer van Tets",
+        "groß, lange Trauben, rot",
+        "erfrischend feinsäuerlich",
+        "M.Juni- A. Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Weiße Versailler",
+        "groß, gelblichweiß",
+        "süßsäuerlich, erfrischend",
+        "E. Juni- A. Juli"
+      ]
+    }
+  ]
+}
