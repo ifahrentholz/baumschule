@@ -1,0 +1,108 @@
+{
+  "title": "Süßkirschen-Sortiment",
+  "category": "obstgehoelze",
+  "order": 10,
+  "group": "Süßkirschen",
+  "columns": [
+    "Sorte",
+    "Reifezeit nach Kirschwochen"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Anabella",
+        "5. KW"
+      ]
+    },
+    {
+      "cells": [
+        "Büttners Rote Knorpelkirsche",
+        "4.-5. KW"
+      ]
+    },
+    {
+      "cells": [
+        "Burlat",
+        "1.-2. KW"
+      ]
+    },
+    {
+      "cells": [
+        "Dönnissens Gelbe Knorpelkirsche",
+        "5.-6. KW"
+      ]
+    },
+    {
+      "cells": [
+        "Große Prinzessinkirsche",
+        "4.-5. KW"
+      ]
+    },
+    {
+      "cells": [
+        "Große Schwarze Knorpelkirsche",
+        "5. KW"
+      ]
+    },
+    {
+      "cells": [
+        "Hedelfinger Riesenkirsche",
+        "5.-6. KW"
+      ]
+    },
+    {
+      "cells": [
+        "Kassins Frühe Herzkirsche",
+        "2 .KW"
+      ]
+    },
+    {
+      "cells": [
+        "Karina",
+        "7. KW"
+      ]
+    },
+    {
+      "cells": [
+        "Kordia",
+        "6. KW"
+      ]
+    },
+    {
+      "cells": [
+        "Lapins",
+        "6.-7. KW"
+      ]
+    },
+    {
+      "cells": [
+        "Regina",
+        "7. KW"
+      ]
+    },
+    {
+      "cells": [
+        "Schneiders Späte Knorpelkirsche",
+        "5.-6. KW"
+      ]
+    },
+    {
+      "cells": [
+        "Summit",
+        "6. KW"
+      ]
+    },
+    {
+      "cells": [
+        "Sunburst",
+        "4.-5. KW"
+      ]
+    },
+    {
+      "cells": [
+        "Van",
+        "4.-5. KW"
+      ]
+    }
+  ]
+}

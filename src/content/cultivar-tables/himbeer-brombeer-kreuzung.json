@@ -1,0 +1,20 @@
+{
+  "title": "Kreuzung zwischen Himbeere und Brombeere",
+  "category": "obstgehoelze",
+  "order": 13,
+  "group": "Himbeeren & Brombeeren",
+  "columns": [
+    "Name",
+    "Allgemeine Angaben",
+    "Genußreife"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Tayberry Medana",
+        "Kreuzung zwischen Himbeere und Brombeere, sehr gr. konisch-längliche Frucht, süßsäuerlich aromatisch",
+        "M. Juli- M. August"
+      ]
+    }
+  ]
+}

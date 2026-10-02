@@ -1,0 +1,102 @@
+{
+  "title": "Neuere Sorten, gelten als mehltaufester",
+  "category": "obstgehoelze",
+  "order": 20,
+  "group": "Stachelbeeren",
+  "columns": [
+    "Name",
+    "Frucht",
+    "Geschmack",
+    "Genußreife"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Hinnonmäki rot",
+        "klein, rot",
+        "süßaromatisch",
+        "A.-M. Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Redeva",
+        "mittelgroß, rot",
+        "leicht säuerlich, sehr aromatisch",
+        "Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Remarka",
+        "groß, rot",
+        "süßsäuerlich, mild",
+        "A. Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Rexrot",
+        "groß, rot",
+        "leicht säuerlich, aromatisch",
+        "M. Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Rokula",
+        "mittelgroß, rot",
+        "leicht säuerlich, sehr aromatisch",
+        "E. Juni- A. Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Hinnonmäki gelb",
+        "klein- mittel, gelb",
+        "süßsäuerlich",
+        "M. Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Resistenta",
+        "mittelgroß, gelb",
+        "fein aromatisch",
+        "E. Juni – A. Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Rixantha",
+        "mittelgroß, gelb",
+        "honigsüß, aromatisch",
+        "E. Juni- A. Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Hinnonmäki grün",
+        "klein- mittel, grün",
+        "süßsäuerlich",
+        "A.-M. Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Mucurines",
+        "mittelgroß, grün",
+        "süß aromatisch",
+        "Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Reverta",
+        "mittelgroß, grün",
+        "aromatisch",
+        "A.- Mitte Juli"
+      ]
+    }
+  ]
+}

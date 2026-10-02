@@ -8,6 +8,14 @@ import type {
 import { getFileInfo } from "prettier";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  parseAssortmentCategories,
+  parseAssortmentPage,
+  parseCultivarTables,
+} from "./assortment";
+import {
+  ASSORTMENT_FILE,
+  ASSORTMENT_FOLDER,
+  CULTIVAR_TABLES_FOLDER,
   IMAGE_FOLDER,
   NOTICES_FOLDER,
   OPENING_HOURS_FILE,
@@ -15,6 +23,7 @@ import {
   SETTINGS_FILE,
   createCmsConfig,
 } from "./cms-config";
+import { ASSORTMENT_CATEGORIES } from "./navigation";
 import { parseNotices } from "./notices";
 import { parseOpeningHours, weekRows } from "./opening-hours";
 import { parseSeasonalOffers } from "./seasonal-offers";
@@ -165,7 +174,12 @@ describe("the files the CMS writes", () => {
   // Prettier would reformat. A format check on these files fails CI on every
   // CMS save and so blocks the deploy.
   it("are left out of the format check, so a CMS save cannot fail CI", async () => {
-    const collectionFiles = ["notices", "seasonal_offers"].map((name) => {
+    const collectionFiles = [
+      "notices",
+      "seasonal_offers",
+      "assortment_categories",
+      "cultivar_tables",
+    ].map((name) => {
       const { folder, extension } = entryCollection(name);
       return `${folder}/new-entry.${extension}`;
     });
@@ -232,6 +246,164 @@ describe("the Seasonal offers collection", () => {
         fieldNames(field && "fields" in field ? (field.fields ?? []) : []),
       ).toEqual(["day", "month"]);
     }
+  });
+});
+
+describe("the Assortment categories collection", () => {
+  it("writes one Markdown file per category into the folder the pages read", () => {
+    const categories = entryCollection("assortment_categories");
+    expect(categories.folder).toBe(ASSORTMENT_FOLDER);
+    expect(categories.extension).toBe("md");
+  });
+
+  // Review finding: with an editable slug, renaming, adding or deleting a
+  // category in the CMS sent a navigation link (src/navigation.ts) to a 404,
+  // orphaned the category's cultivar tables and turned CI red. The seven
+  // categories are fixed by the page tree, so the CMS edits their content
+  // only and can never change the set of slugs.
+  it("cannot add, delete, duplicate or rename a category, so no save changes the set of slugs", () => {
+    const categories = entryCollection("assortment_categories");
+    expect(categories.create).toBe(false);
+    expect(categories.delete).toBe(false);
+    expect(categories.duplicate).toBe(false);
+    expect(categories.slug).toBeUndefined();
+  });
+
+  it("edits title, order, teaser text and image, body, sub-groups and gallery", () => {
+    const { fields } = entryCollection("assortment_categories");
+    expect(fieldNames(fields)).toEqual([
+      "title",
+      "order",
+      "teaser",
+      "teaser_image",
+      "body",
+      "subgroups",
+      "gallery",
+    ]);
+  });
+});
+
+describe("the Cultivar tables collection", () => {
+  it("writes one JSON file per table into the folder the category pages read", () => {
+    const tables = entryCollection("cultivar_tables");
+    expect(tables.folder).toBe(CULTIVAR_TABLES_FOLDER);
+    expect(tables.format).toBe("json");
+    expect(tables.extension).toBe("json");
+  });
+
+  it("edits title, a category reference, order, group, intro, free columns and rows of cells", () => {
+    const { fields } = entryCollection("cultivar_tables");
+    expect(fieldNames(fields)).toEqual([
+      "title",
+      "category",
+      "order",
+      "group",
+      "intro",
+      "columns",
+      "rows",
+    ]);
+    expect(
+      fields.find((field) => "name" in field && field.name === "category"),
+    ).toMatchObject({
+      widget: "relation",
+      collection: "assortment_categories",
+      value_field: "{{slug}}",
+    });
+  });
+});
+
+describe("the Assortment singleton", () => {
+  it("edits the catalogue link file the overview reads, as JSON", () => {
+    const assortment = singleton("assortment");
+    expect(assortment.file).toBe(ASSORTMENT_FILE);
+    expect(assortment.format).toBe("json");
+    expect(fieldNames(assortment.fields)).toEqual(["catalogue_url"]);
+  });
+
+  // AC-14, D12: the catalogue stays external; the URL is the one the old
+  // /sortiment/ page links.
+  it("is committed and links the gartenmedien online catalogue", () => {
+    expect(
+      parseAssortmentPage(JSON.parse(readFileSync(ASSORTMENT_FILE, "utf8"))),
+    ).toEqual({
+      catalogueUrl:
+        "https://baumschule-fischer.de.onlinekatalog.gartenmedien.de/",
+    });
+  });
+});
+
+describe("the committed assortment categories", () => {
+  // AC-3: the seven categories of the old site, under its slugs, each
+  // producing a /sortiment/<slug>/ page. Only the slugs are compared: title
+  // and order are editable in the CMS, and editing them must not fail CI.
+  it("are the seven categories of the navigation, all valid, each with a page", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const files = import.meta.glob<{ frontmatter: unknown }>(
+      "/src/content/assortment/*.md",
+      { eager: true },
+    );
+    const categories = parseAssortmentCategories(files).map(
+      ({ category }) => category,
+    );
+    const navPaths = ASSORTMENT_CATEGORIES.map(({ path }) => path).sort();
+    expect(
+      categories.map((category) => `/sortiment/${category.slug}/`).sort(),
+    ).toEqual(navPaths);
+    expect(warn).not.toHaveBeenCalled();
+    vi.restoreAllMocks();
+
+    const { getStaticPaths } = await import("./pages/sortiment/[slug].astro");
+    expect(
+      getStaticPaths()
+        .map((entry) => `/sortiment/${entry.params.slug}/`)
+        .sort(),
+    ).toEqual(navPaths);
+  });
+});
+
+describe("the committed cultivar tables", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  // AC-3: the 20 cultivar tables of the old /sortiment/obstgehoelze/ page,
+  // migrated read-only (titles verbatim), in the page's order.
+  it("are the old Obstgehölze page's 20 tables, all valid and in its order", () => {
+    const warn = vi.spyOn(console, "warn");
+    const files = Object.fromEntries(
+      readdirSync(CULTIVAR_TABLES_FOLDER).map((name) => [
+        `${CULTIVAR_TABLES_FOLDER}/${name}`,
+        JSON.parse(readFileSync(`${CULTIVAR_TABLES_FOLDER}/${name}`, "utf8")),
+      ]),
+    );
+    const tables = parseCultivarTables(files);
+    expect(tables.map((table) => table.title)).toEqual([
+      "Apfel-Sortiment",
+      "Befruchtungstabelle für Äpfel",
+      "Birnen – Sortiment",
+      "Befruchtungstabelle für Birnen",
+      "Pfirsiche",
+      "Aprikosen",
+      "Pflaumen-Sortiment",
+      "Sauerkirschen-Sortiment",
+      "Neue Sorten, die weniger anfällig gegenüber Monilia sind:",
+      "Süßkirschen-Sortiment",
+      "Genussreifetabelle für Süßkirschen",
+      "Himbeeren",
+      "Kreuzung zwischen Himbeere und Brombeere",
+      "Brombeeren",
+      "Gartenheidelbeeren",
+      "Johannisbeeren",
+      "Neuere Sorten",
+      "Kreuzung zwischen Johannisbeere und Stachelbeere",
+      "Stachelbeeren",
+      "Neuere Sorten, gelten als mehltaufester",
+    ]);
+    for (const table of tables) {
+      expect(table.category, table.id).toBe("obstgehoelze");
+      expect(table.rows.length, table.id).toBeGreaterThan(0);
+    }
+    expect(warn).not.toHaveBeenCalled();
   });
 });
 

@@ -1,0 +1,41 @@
+{
+  "title": "Neue Sorten, die weniger anfällig gegenüber Monilia sind:",
+  "category": "obstgehoelze",
+  "order": 9,
+  "group": "Sauerkirschen",
+  "columns": [
+    "Sauerkirsch – Sorte",
+    "Befruchtungssorte",
+    "Genußreife"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Morina",
+        "Lapins, Schneiders späte",
+        "Mitte Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Saphir",
+        "selbstfruchtbar, höhere Erträge bei Fremdbefruchtung mit Schattenmorelle",
+        "Mitte Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Topas",
+        "selbstfruchtbar",
+        "Ende Juli – Anf. August"
+      ]
+    },
+    {
+      "cells": [
+        "Karneol",
+        "Schattenmorelle, Morelllenfeuer",
+        "Anfang – Mitte August"
+      ]
+    }
+  ]
+}

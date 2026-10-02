@@ -1,0 +1,54 @@
+{
+  "title": "Brombeeren",
+  "category": "obstgehoelze",
+  "order": 14,
+  "group": "Himbeeren & Brombeeren",
+  "columns": [
+    "Name",
+    "Frucht",
+    "Geschmack",
+    "Genußreife"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Navaho -stachellos",
+        "groß",
+        "aromatisch",
+        "A. Aug. – E. Sept."
+      ]
+    },
+    {
+      "cells": [
+        "Theodor Reimers",
+        "groß",
+        "sehr saftig, aromatisch",
+        "Juli- M. Sept."
+      ]
+    },
+    {
+      "cells": [
+        "Thornfree -stachellos",
+        "sehr groß",
+        "leicht herb-säuerlich",
+        "M.- E. Aug."
+      ]
+    },
+    {
+      "cells": [
+        "Thornless Evergreen",
+        "mittelgroß",
+        "süß-säuerlich",
+        "M. Aug. – E. Okt."
+      ]
+    },
+    {
+      "cells": [
+        "Wilsons Frühe",
+        "mittelgroß, fest",
+        "süßlich",
+        "E. Juli- A. Aug."
+      ]
+    }
+  ]
+}

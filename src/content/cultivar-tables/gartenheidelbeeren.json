@@ -1,0 +1,62 @@
+{
+  "title": "Gartenheidelbeeren",
+  "category": "obstgehoelze",
+  "order": 15,
+  "group": "Himbeeren & Brombeeren",
+  "columns": [
+    "Name",
+    "Frucht",
+    "Geschmack",
+    "Genußreife"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Berkeley",
+        "groß- sehr groß, hoher Ertrag",
+        "gut im Geschmack",
+        "A. August"
+      ]
+    },
+    {
+      "cells": [
+        "Bluecrop",
+        "groß, ertragreich",
+        "sehr aromatisch",
+        "A. August"
+      ]
+    },
+    {
+      "cells": [
+        "Earlyblue",
+        "groß-mittelgroß",
+        "sehr aromatisch",
+        "A. Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Elisabeth",
+        "groß fest",
+        "gutes Aroma",
+        "M. August"
+      ]
+    },
+    {
+      "cells": [
+        "Goldtraube",
+        "groß, fest",
+        "aromatisch",
+        "E. Juli"
+      ]
+    },
+    {
+      "cells": [
+        "Hardy Blue",
+        "groß bis sehr groß, Ertrag regelmäßig hoch",
+        "süß-säuerlich, aromatisch",
+        "E. Juli – A. August"
+      ]
+    }
+  ]
+}

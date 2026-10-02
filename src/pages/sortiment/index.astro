@@ -1,5 +1,106 @@
 ---
+// The assortment overview: the link to the external gartenmedien online
+// catalogue (spec D12, AC-14; wording from the old /sortiment/ page) and a teaser per assortment category, in the
+// categories' order (`src/assortment.ts`).
+import { Image } from "astro:assets";
+import { loadAssortment, loadAssortmentPage } from "../../assortment-entries";
 import PageShell from "../../layouts/PageShell.astro";
+import { withBase } from "../../navigation";
+
+const base = import.meta.env.BASE_URL;
+const entries = loadAssortment();
+const { catalogueUrl } = loadAssortmentPage();
 ---
 
-<PageShell path="/sortiment/" />
+<PageShell path="/sortiment/">
+  {catalogueUrl && (
+    <aside class="catalogue" aria-labelledby="online-katalog">
+      <h2 id="online-katalog">
+        Der Sortimentskatalog der Baumschulen Ewald Fischer
+      </h2>
+      <p>
+        Mit unserem Sortimentskatalog geben wir Ihnen eine praktische Hilfe für
+        die Pflanzenauswahl und die Gartenplanung an die Hand.
+      </p>
+      <p>
+        Die digitale Version unseres Kataloges finden Sie als interaktive
+        Pdf-Datei unter dem folgenden Link:
+      </p>
+      <a class="catalogue-link" href={catalogueUrl}>
+        Zum Online-Katalog
+      </a>
+    </aside>
+  )}
+
+  <ul class="categories">
+    {entries.map(({ category, teaserImage }) => (
+      <li>
+        {teaserImage && (
+          <Image
+            src={teaserImage}
+            alt=""
+            widths={[320, 640, 960]}
+            sizes="(min-width: 40rem) 20rem, 100vw"
+          />
+        )}
+        <h2>
+          <a href={withBase(base, `/sortiment/${category.slug}/`)}>
+            {category.title}
+          </a>
+        </h2>
+        {category.teaser && <p>{category.teaser}</p>}
+      </li>
+    ))}
+  </ul>
+</PageShell>
+
+<style>
+  .catalogue {
+    margin-block-end: var(--space-l);
+    padding: var(--space-m);
+    background: var(--surface-alt);
+    border-inline-start: 4px solid var(--color-leaf);
+    border-radius: var(--radius);
+  }
+
+  .catalogue h2 {
+    color: var(--color-fir);
+    font-size: var(--step-2);
+  }
+
+  .catalogue-link {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-m);
+    background: var(--color-fir);
+    color: var(--on-band);
+    font-family: var(--font-ui);
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: var(--radius);
+  }
+
+  .catalogue-link:hover {
+    background: var(--color-moss);
+    color: var(--on-band);
+  }
+
+  .categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: var(--grid-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .categories :global(img) {
+    width: 100%;
+    height: auto;
+    margin-block-end: var(--space-xs);
+    border-radius: var(--radius);
+  }
+
+  .categories h2 {
+    font-size: var(--step-1);
+  }
+</style>

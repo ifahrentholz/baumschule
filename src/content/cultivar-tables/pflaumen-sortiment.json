@@ -1,0 +1,105 @@
+{
+  "title": "Pflaumen-Sortiment",
+  "category": "obstgehoelze",
+  "order": 7,
+  "group": "Pflaumen",
+  "intro": "Unter der Bezeichnung Pflaume werden die von verschiedenen Wildformen abstammenden und miteinander vermischten Arten Zwetsche (Zwetschge, Zwetschke, Quetsche), Pflaume, Mirabelle und Reneklode zusammengefasst. Sie unterscheiden sich hinsichtlich Fruchtgröße, -form, Steinlöslichkeit, Geschmack, Konsistenz des Fruchtfleisches und damit auch in Bezug auf Verwendungsmöglichkeit. Die hier aufgeführten Sorten sind meist selbstfruchtbar. Fremdbefruchtung erhöht allerdings den Ertrag.",
+  "columns": [
+    "Sorte",
+    "Befruchtungssorte",
+    "Genußreife"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Anna Späth",
+        "selbstfruchtbar",
+        "9.-10."
+      ]
+    },
+    {
+      "cells": [
+        "Borsumer Zwetsche",
+        "selbstfruchtbar",
+        "9."
+      ]
+    },
+    {
+      "cells": [
+        "Bühler Frühzwetsche",
+        "selbstfruchtbar",
+        "8."
+      ]
+    },
+    {
+      "cells": [
+        "Graf Althans Reneklode",
+        "Große Grüne Reneklode Oullins Reneklode",
+        "8.-9."
+      ]
+    },
+    {
+      "cells": [
+        "Große Grüne Reneklode",
+        "Bühler Frühzwetsche Hauszwetsche Nancymirabelle",
+        "Ende 8.-Anfang 9."
+      ]
+    },
+    {
+      "cells": [
+        "Hanita",
+        "selbstfruchtbar",
+        "Ende 8.-Anfang 9."
+      ]
+    },
+    {
+      "cells": [
+        "Hauszwetsche",
+        "selbstfruchtbar",
+        "9.-10"
+      ]
+    },
+    {
+      "cells": [
+        "Italienische Zwetsche",
+        "Große Grüne Reneklode Hauszwetsche",
+        "Ende 8.-Anfang 9."
+      ]
+    },
+    {
+      "cells": [
+        "Königin Viktoria",
+        "selbstfruchtbar",
+        "8.-9."
+      ]
+    },
+    {
+      "cells": [
+        "Nancymirabelle",
+        "selbstfruchtbar",
+        "8."
+      ]
+    },
+    {
+      "cells": [
+        "Ontariopflaume",
+        "selbstfruchtbar",
+        "8."
+      ]
+    },
+    {
+      "cells": [
+        "Oullins Reneklode",
+        "selbstfruchtbar",
+        "8."
+      ]
+    },
+    {
+      "cells": [
+        "The Czar",
+        "selbstfruchtbar",
+        "7.-8."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "title": "Genussreifetabelle für Süßkirschen",
+  "category": "obstgehoelze",
+  "order": 11,
+  "group": "Süßkirschen",
+  "columns": [
+    "Sorte",
+    "Befruchtersorte"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Anabella",
+        "Schneiders Späte Knorpelkirsche"
+      ]
+    },
+    {
+      "cells": [
+        "Büttners Rote Knorpelkirsche",
+        "Große Schwarze Knorpelkirsche, Hedelfinger Riesenkirsche, Kassins Frühe Herzkirsche, Schneiders Späte Knorpelkirsche"
+      ]
+    },
+    {
+      "cells": [
+        "Burlat",
+        "Große Prinzesskirsche, Hedelfinger Riesenkirsche"
+      ]
+    },
+    {
+      "cells": [
+        "Dönnissens Gelbe Knorpelkirsche",
+        "Büttners Rote Knorpelkirsche, Schneiders Späte Knorpelkirsche"
+      ]
+    },
+    {
+      "cells": [
+        "Große Prinzesskirsche",
+        "Haumüllers Mitteldicke, Geisepitter, Spansche Knorpel (nicht in unserem Sortiment vorhanden)"
+      ]
+    },
+    {
+      "cells": [
+        "Große Schwarze Knorpelkirsche",
+        "Büttners Rote Knorpelkirsche, Große Prinzesskirsche, Hedelfinger Riesenkirsche"
+      ]
+    },
+    {
+      "cells": [
+        "Hedelfinger Riesenkirsche",
+        "Büttners Rote Knorpelkirsche, Dönnissens Gelbe Knorpelkirsche, Schneiders Späte Knorpelkirsche"
+      ]
+    },
+    {
+      "cells": [
+        "Kassins Frühe Herzkirsche",
+        "Dönnissens Gelbe Knorpelkirsche, Van, Schneiders Späte Knorpelkirsche, Burlat"
+      ]
+    },
+    {
+      "cells": [
+        "Karina",
+        "zur Zeit nicht bekannt"
+      ]
+    },
+    {
+      "cells": [
+        "Kordia",
+        "Hedelfinger Riesenkirsche, Van"
+      ]
+    },
+    {
+      "cells": [
+        "Lapins",
+        "selbstfruchtbar"
+      ]
+    },
+    {
+      "cells": [
+        "Regina",
+        "Schneiders Späte Knorpelkirsche"
+      ]
+    },
+    {
+      "cells": [
+        "Schneiders Späte Knorpelkirsche",
+        "Große Prinzesskirsche"
+      ]
+    },
+    {
+      "cells": [
+        "Summit",
+        "zur Zeit nicht bekannt"
+      ]
+    },
+    {
+      "cells": [
+        "Sunburst",
+        "selbstfruchtbar"
+      ]
+    },
+    {
+      "cells": [
+        "Van",
+        "Burlat, Kassins Frühe Herzkirsche, Schneiders Späte Knorpelkirsche"
+      ]
+    }
+  ]
+}

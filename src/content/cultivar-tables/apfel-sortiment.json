@@ -1,0 +1,216 @@
+{
+  "title": "Apfel-Sortiment",
+  "category": "obstgehoelze",
+  "order": 1,
+  "group": "Äpfel",
+  "columns": [
+    "Sorte",
+    "Genußreife in Monaten"
+  ],
+  "rows": [
+    {
+      "cells": [
+        "Alkmene",
+        "9.- Ende 10."
+      ]
+    },
+    {
+      "cells": [
+        "Ananasrenette",
+        "Anfang 11. – Mitte 2."
+      ]
+    },
+    {
+      "cells": [
+        "Berlepsch, Roter Berlepsch",
+        "11. – 2."
+      ]
+    },
+    {
+      "cells": [
+        "Boskoop, Roter Boskoop",
+        "12.-3."
+      ]
+    },
+    {
+      "cells": [
+        "Brettacher",
+        "Mitte 12."
+      ]
+    },
+    {
+      "cells": [
+        "Cox Orange",
+        "10.-12."
+      ]
+    },
+    {
+      "cells": [
+        "Elstar",
+        "Ende 9.-5."
+      ]
+    },
+    {
+      "cells": [
+        "Geheimrat Oldenburg",
+        "9.-11."
+      ]
+    },
+    {
+      "cells": [
+        "Gloster",
+        "11.-2."
+      ]
+    },
+    {
+      "cells": [
+        "Golden Delicious",
+        "11.-3."
+      ]
+    },
+    {
+      "cells": [
+        "Goldparmäne",
+        "11.-2."
+      ]
+    },
+    {
+      "cells": [
+        "Gravensteiner",
+        "9.-11."
+      ]
+    },
+    {
+      "cells": [
+        "Idared",
+        "1.-4."
+      ]
+    },
+    {
+      "cells": [
+        "Ingrid Marie",
+        "11.-1."
+      ]
+    },
+    {
+      "cells": [
+        "Jakob Lebel",
+        "10.-1."
+      ]
+    },
+    {
+      "cells": [
+        "Jamba",
+        "9.-10."
+      ]
+    },
+    {
+      "cells": [
+        "James Grieve, Roter James Grieve",
+        "9.-10"
+      ]
+    },
+    {
+      "cells": [
+        "Jonagold",
+        "Ende 10.- 5."
+      ]
+    },
+    {
+      "cells": [
+        "Jonathan",
+        "12.-3."
+      ]
+    },
+    {
+      "cells": [
+        "Landsberger Renette",
+        "11.-1."
+      ]
+    },
+    {
+      "cells": [
+        "Melrose",
+        "11.-3."
+      ]
+    },
+    {
+      "cells": [
+        "Ontarioapfel",
+        "1.-4."
+      ]
+    },
+    {
+      "cells": [
+        "Prinzenapfel",
+        "10. -Anfang 1."
+      ]
+    },
+    {
+      "cells": [
+        "Schöner von Herrenhut",
+        "10.-12."
+      ]
+    },
+    {
+      "cells": [
+        "Starking Earliest",
+        "8.-9."
+      ]
+    },
+    {
+      "cells": [
+        "Weißer Klarapfel",
+        "7.-8."
+      ]
+    },
+    {
+      "cells": [
+        "Pi und Re – Sorten:",
+        ""
+      ]
+    },
+    {
+      "cells": [
+        "Pilot",
+        "12.-5."
+      ]
+    },
+    {
+      "cells": [
+        "Pinova",
+        "11.-4."
+      ]
+    },
+    {
+      "cells": [
+        "Piros",
+        "Ende 7.-Ende 8."
+      ]
+    },
+    {
+      "cells": [
+        "Reglindis",
+        "9."
+      ]
+    },
+    {
+      "cells": [
+        "Remo",
+        "9.-10."
+      ]
+    },
+    {
+      "cells": [
+        "Retina",
+        "8.-9."
+      ]
+    },
+    {
+      "cells": [
+        "Rewena",
+        "11.-3."
+      ]
+    }
+  ]
+}

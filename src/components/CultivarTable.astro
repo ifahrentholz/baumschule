@@ -1,0 +1,78 @@
+---
+// One cultivar table (`src/assortment.ts`), e.g. "Apfel-Sortiment": its own
+// columns, one row per cultivar, after its optional intro text. Wide tables
+// scroll sideways inside their wrapper instead of widening the page on
+// phones. `level` is the heading level: 4 below a group heading, else 3.
+import { paragraphs, type CultivarTable } from "../assortment";
+
+interface Props {
+  table: CultivarTable;
+  level?: 3 | 4;
+}
+
+const { table, level = 3 } = Astro.props;
+const Heading = `h${level}` as const;
+const headingId = `sortentabelle-${table.id}`;
+---
+
+<section class="cultivar-table" aria-labelledby={headingId}>
+  <Heading id={headingId}>{table.title}</Heading>
+  {paragraphs(table.intro).map((paragraph) => (
+    <p>{paragraph}</p>
+  ))}
+  <div class="scroll" role="region" aria-labelledby={headingId} tabindex="0">
+    <table>
+      <thead>
+        <tr>
+          {table.columns.map((column) => (
+            <th scope="col">{column}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {table.rows.map((row) => (
+          <tr>
+            {row.map((cell, i) =>
+              i === 0 ? <th scope="row">{cell}</th> : <td>{cell}</td>,
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<style>
+  .cultivar-table {
+    margin-block: var(--space-l);
+  }
+
+  .scroll {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-ui);
+    font-size: var(--step--1);
+  }
+
+  th,
+  td {
+    padding: var(--space-2xs) var(--space-xs);
+    border-block-end: 1px solid var(--color-rule);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  thead th {
+    background: var(--surface-alt);
+    color: var(--color-fir);
+    border-block-end-width: 2px;
+  }
+
+  tbody th {
+    font-weight: 700;
+  }
+</style>
