@@ -20,13 +20,15 @@ import {
   NOTICES_FOLDER,
   OPENING_HOURS_FILE,
   SEASONAL_OFFERS_FOLDER,
+  SERVICES_FOLDER,
   SETTINGS_FILE,
   createCmsConfig,
 } from "./cms-config";
-import { ASSORTMENT_CATEGORIES } from "./navigation";
+import { ASSORTMENT_CATEGORIES, SERVICES } from "./navigation";
 import { parseNotices } from "./notices";
 import { parseOpeningHours, weekRows } from "./opening-hours";
 import { parseSeasonalOffers } from "./seasonal-offers";
+import { parseServices } from "./services";
 import { parseSettings } from "./settings";
 
 const PHASE_1_SITE = "https://ifahrentholz.de/baumschule/";
@@ -179,6 +181,7 @@ describe("the files the CMS writes", () => {
       "seasonal_offers",
       "assortment_categories",
       "cultivar_tables",
+      "services",
     ].map((name) => {
       const { folder, extension } = entryCollection(name);
       return `${folder}/new-entry.${extension}`;
@@ -312,6 +315,34 @@ describe("the Cultivar tables collection", () => {
   });
 });
 
+describe("the Services collection", () => {
+  it("writes one Markdown file per service into the folder the pages read", () => {
+    const services = entryCollection("services");
+    expect(services.folder).toBe(SERVICES_FOLDER);
+    expect(services.extension).toBe("md");
+  });
+
+  it("cannot add, delete, duplicate or rename a service, so no save changes the set of slugs", () => {
+    const services = entryCollection("services");
+    expect(services.create).toBe(false);
+    expect(services.delete).toBe(false);
+    expect(services.duplicate).toBe(false);
+    expect(services.slug).toBeUndefined();
+  });
+
+  it("edits title, order, teaser text and image, body and gallery", () => {
+    const { fields } = entryCollection("services");
+    expect(fieldNames(fields)).toEqual([
+      "title",
+      "order",
+      "teaser",
+      "teaser_image",
+      "body",
+      "gallery",
+    ]);
+  });
+});
+
 describe("the Assortment singleton", () => {
   it("edits the catalogue link file the overview reads, as JSON", () => {
     const assortment = singleton("assortment");
@@ -358,6 +389,47 @@ describe("the committed assortment categories", () => {
         .map((entry) => `/sortiment/${entry.params.slug}/`)
         .sort(),
     ).toEqual(navPaths);
+  });
+});
+
+describe("the committed services", () => {
+  // AC-3: the four services of the old /leistungen/ pages, under the slugs
+  // of the navigation, each producing a /service/<slug>/ page, so a missing
+  // or invalid file cannot silently drop a navigation target.
+  it("are the four services of the navigation, all valid, each with a page", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const files = import.meta.glob<{ frontmatter: unknown }>(
+      "/src/content/services/*.md",
+      { eager: true },
+    );
+    const services = parseServices(files).map(({ service }) => service);
+    const navPaths = SERVICES.map(({ path }) => path).sort();
+    expect(
+      services.map((service) => `/service/${service.slug}/`).sort(),
+    ).toEqual(navPaths);
+    expect(warn).not.toHaveBeenCalled();
+    vi.restoreAllMocks();
+
+    const { getStaticPaths } = await import("./pages/service/[slug].astro");
+    expect(
+      getStaticPaths()
+        .map((entry) => `/service/${entry.params.slug}/`)
+        .sort(),
+    ).toEqual(navPaths);
+  });
+
+  // A missing image only warns at build time; the migrated photos must all
+  // be there.
+  it("resolve every teaser and gallery image they name", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { loadServices } = await import("./service-entries");
+    for (const { service, teaserImage, gallery } of loadServices()) {
+      expect(teaserImage, service.slug).toBeDefined();
+      expect(gallery, service.slug).toHaveLength(service.gallery.length);
+      expect(service.gallery.length, service.slug).toBeGreaterThan(0);
+    }
+    expect(warn).not.toHaveBeenCalled();
+    vi.restoreAllMocks();
   });
 });
 

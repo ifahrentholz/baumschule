@@ -1,5 +1,60 @@
 ---
+// The services overview: a teaser per service, in the services' order
+// (`src/services.ts`).
+import { Image } from "astro:assets";
 import PageShell from "../../layouts/PageShell.astro";
+import { withBase } from "../../navigation";
+import { loadServices } from "../../service-entries";
+
+const base = import.meta.env.BASE_URL;
+const entries = loadServices();
 ---
 
-<PageShell path="/service/" />
+<PageShell path="/service/">
+  <ul class="services">
+    {entries.map(({ service, teaserImage }) => (
+      <li>
+        {teaserImage && (
+          <Image
+            src={teaserImage}
+            alt=""
+            widths={[320, 640, 960]}
+            sizes="(min-width: 40rem) 20rem, 100vw"
+          />
+        )}
+        <h2>
+          <a href={withBase(base, `/service/${service.slug}/`)}>
+            {service.title}
+          </a>
+        </h2>
+        {service.teaser && <p>{service.teaser}</p>}
+      </li>
+    ))}
+  </ul>
+</PageShell>
+
+<style>
+  .services {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: var(--grid-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* The teaser photos differ in shape (square, 4:3, 16:9); one crop keeps
+     the cards' titles in line. */
+  .services :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    margin-block-end: var(--space-xs);
+    border-radius: var(--radius);
+  }
+
+  .services h2 {
+    font-size: var(--step-1);
+  }
+</style>

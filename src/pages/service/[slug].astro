@@ -1,17 +1,77 @@
 ---
-// One shell per service; the services come from the
-// navigation tree until the content collection (#5 onwards) takes over.
+// One page per service (Services collection, `src/services.ts`): teaser
+// image, body and gallery. A service without any content yet shows the
+// shell's "being rebuilt" notice.
 import type { GetStaticPaths } from "astro";
+import { Image } from "astro:assets";
 import PageShell from "../../layouts/PageShell.astro";
-import { SERVICES } from "../../navigation";
+import { loadServices } from "../../service-entries";
 
 export const getStaticPaths = (() =>
-  SERVICES.map(({ path }) => ({
-    params: { slug: path.split("/").at(-2) },
-    props: { path },
+  loadServices().map((entry) => ({
+    params: { slug: entry.service.slug },
+    props: { entry },
   }))) satisfies GetStaticPaths;
 
-const { path } = Astro.props;
+const { entry } = Astro.props;
+const { service, Content, hasBody, teaserImage, gallery } = entry;
+const path = `/service/${service.slug}/`;
+const isEmpty = !hasBody && !teaserImage && gallery.length === 0;
 ---
 
-<PageShell path={path} />
+{isEmpty ? (
+  <PageShell path={path} heading={service.title} lead={service.teaser} />
+) : (
+  <PageShell path={path} heading={service.title} lead={service.teaser}>
+    {teaserImage && (
+      <Image
+        class="service-image"
+        src={teaserImage}
+        alt=""
+        widths={[480, 800, 1200]}
+        sizes="(min-width: 64rem) 40rem, 100vw"
+      />
+    )}
+
+    {hasBody && <Content />}
+
+    {gallery.length > 0 && (
+      <ul class="gallery" aria-label={`Bilder: ${service.title}`}>
+        {gallery.map(({ image, alt }) => (
+          <li>
+            <Image
+              src={image}
+              alt={alt}
+              widths={[320, 640, 960]}
+              sizes="(min-width: 40rem) 20rem, 100vw"
+            />
+          </li>
+        ))}
+      </ul>
+    )}
+  </PageShell>
+)}
+
+<style>
+  .service-image {
+    width: 100%;
+    height: auto;
+    margin-block-end: var(--space-m);
+    border-radius: var(--radius);
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    gap: var(--space-s);
+    margin-block: var(--space-l);
+    padding: 0;
+    list-style: none;
+  }
+
+  .gallery :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+  }
+</style>
