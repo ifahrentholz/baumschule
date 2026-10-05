@@ -1,0 +1,246 @@
+{
+  "timeline": [
+    {
+      "year": "1955",
+      "text": "Die Baumschule wurde von Gärtnermeister Ewald Fischer und dem Gärtnergesellen Gerhard Seidel in Berlin-Alt-Rudow gegründet."
+    },
+    {
+      "year": "Ende 1950er",
+      "text": "Nach der Trennung von Gerhard Seidel, war die Baumschule ansässig in Berlin-Lichtenrade."
+    },
+    {
+      "year": "Ab 1970",
+      "text": "Die Umsiedlung unter der Leitung von Diplomgärtner Hans-Jürgen Fischer nach Berlin Rudow, auf die heutigen Verkaufsflächen erfolgte."
+    },
+    {
+      "year": "1974",
+      "text": "nahe Hannover wird ein Anzuchtbetrieb mit einer Fläche von 18 ha aufgebaut."
+    },
+    {
+      "year": "1982",
+      "text": "Die Söhne Hans-Jürgen und Karl-Heinz Fischer übernahmen den Betrieb."
+    },
+    {
+      "year": "1995",
+      "text": "mit dem Aufbau eines polnischen Betriebes in der Nähe von Stettin wird begonnen."
+    },
+    {
+      "year": "2002",
+      "text": "Mit Beginn des Jahres tritt Dipl.-Ing. Katrin Fischer in der dritten Generation in die Baumschule ein."
+    },
+    {
+      "year": "2008",
+      "text": "Seit 2008 wird die Baumschule von den Geschwistern Felix Fischer (B.Sc Gartenbau) und Dipl.-Ing. Katrin Fischer geführt."
+    }
+  ],
+  "impressions": {
+    "heading": "Wir freuen uns auf Sie!",
+    "intro": "Das Gelände der Baumschule Fischer steht Ihnen während unserer Öffnungszeiten jederzeit für einen Spaziergang offen.",
+    "images": [
+      {
+        "image": "/src/assets/images/impression-01.jpg",
+        "alt": "Rad- und Fußweg am Baumschulgelände mit dem Schild „Baumschulen Ewald Fischer“ vor Säulen-Koniferen und Bäumen"
+      },
+      {
+        "image": "/src/assets/images/impression-02.jpg",
+        "alt": "Rotes Laub eines Baumes im Gegenlicht vor blauem Himmel"
+      },
+      {
+        "image": "/src/assets/images/impression-03.jpg",
+        "alt": "Wegweiser der Baumschulen Ewald Fischer zu den Sortimentsbereichen zwischen Bäumen und Sträuchern"
+      },
+      {
+        "image": "/src/assets/images/impression-04.jpg",
+        "alt": "Junge Birken mit Wurzelballen, an ein Gestell vor einem grünen Schutznetz gelehnt"
+      },
+      {
+        "image": "/src/assets/images/impression-05.jpg",
+        "alt": "Ein Mitarbeiter verschnürt den Ballen eines frisch gerodeten Baumes, dahinter eine grüne Rodemaschine"
+      },
+      {
+        "image": "/src/assets/images/impression-06.jpg",
+        "alt": "Gelbe Blüten an kahlen Zweigen im Vorfrühling"
+      },
+      {
+        "image": "/src/assets/images/impression-07.jpg",
+        "alt": "Zwei Mitarbeiter machen nach einer Pflanzung eine Pause auf Liegestühlen"
+      },
+      {
+        "image": "/src/assets/images/impression-08.jpg",
+        "alt": "Eine Reihe gelbgrüner Säulen-Koniferen vor blauem Himmel"
+      },
+      {
+        "image": "/src/assets/images/impression-09.jpg",
+        "alt": "Das Team der Baumschule mit Maschinen, Lkw und Hund vor dem Verkaufsgebäude"
+      },
+      {
+        "image": "/src/assets/images/impression-10.jpg",
+        "alt": "Ein Mitarbeiter mit Klemmbrett zwischen weiß und rosa blühenden Hortensien in Töpfen"
+      },
+      {
+        "image": "/src/assets/images/impression-11.jpg",
+        "alt": "Hängende gelbgrüne Blütentrauben an einem Zweig"
+      },
+      {
+        "image": "/src/assets/images/impression-12.jpg",
+        "alt": "Ein Lader bringt eine Gitterbox voller Jungbäume mit Ballen über das Gelände"
+      },
+      {
+        "image": "/src/assets/images/impression-13.jpg",
+        "alt": "Zwei Hunde ruhen vor dem Haus, einer davon auf einer Holzkiste"
+      },
+      {
+        "image": "/src/assets/images/impression-14.jpg",
+        "alt": "Weiße Blüte mit gelben Staubgefäßen zwischen grünem Laub"
+      },
+      {
+        "image": "/src/assets/images/impression-15.jpg",
+        "alt": "Ein Quartier mit Reihen junger Bäume unter blauem Himmel"
+      },
+      {
+        "image": "/src/assets/images/impression-16.jpg",
+        "alt": "Gefüllte rosa Blüten einer Zierkirsche"
+      },
+      {
+        "image": "/src/assets/images/impression-17.jpg",
+        "alt": "Ein gerodeter großer Baum mit Wurzelballen liegt auf Holzböcken"
+      },
+      {
+        "image": "/src/assets/images/impression-18.jpg",
+        "alt": "Kiefern und andere Nadelgehölze auf einem Quartier im Herbst"
+      },
+      {
+        "image": "/src/assets/images/impression-19.jpg",
+        "alt": "Gehölze in Herbstfärbung, darunter zwei rot belaubte Bäume und gelbe Säulen-Koniferen, im Abendlicht"
+      },
+      {
+        "image": "/src/assets/images/impression-20.jpg",
+        "alt": "Ein Lkw-Kran hebt einen Baum mit Ballen über eine Wohnstraße"
+      },
+      {
+        "image": "/src/assets/images/impression-21.jpg",
+        "alt": "Lkw mit Anhänger der Baumschulen Ewald Fischer an einer Tankstelle"
+      },
+      {
+        "image": "/src/assets/images/impression-22.jpg",
+        "alt": "Eine Mitarbeiterin mäht mit einem Aufsitzmäher zwischen Reihen junger Obstbäume"
+      },
+      {
+        "image": "/src/assets/images/impression-23.jpg",
+        "alt": "Kräftig rosa Blüten an kahlen Zweigen im Frühling"
+      },
+      {
+        "image": "/src/assets/images/impression-24.jpg",
+        "alt": "Ein gelber Mobilbagger trägt einen gerodeten Baum mit seinen Wurzeln"
+      },
+      {
+        "image": "/src/assets/images/impression-25.jpg",
+        "alt": "Ein Mobilbagger mit Greifer neben einer frisch ausgehobenen Grube auf einem Quartier"
+      },
+      {
+        "image": "/src/assets/images/impression-26.jpg",
+        "alt": "Ein Mitarbeiter und ein Mobilbagger bewegen einen großen Baum mit Wurzelballen im Abendlicht"
+      },
+      {
+        "image": "/src/assets/images/impression-27.jpg",
+        "alt": "Ein Teleskoplader mit Palettengabel auf einem Weg zwischen Gehölzen"
+      },
+      {
+        "image": "/src/assets/images/impression-28.jpg",
+        "alt": "Lieferwagen der Baumschule vor dem Gewächshaus unter rot gefärbtem Himmel"
+      },
+      {
+        "image": "/src/assets/images/impression-29.jpg",
+        "alt": "Ein Lkw der Baumschule mit Holzkisten voller Pflanzen mit Ballen auf der Ladefläche"
+      },
+      {
+        "image": "/src/assets/images/impression-30.jpg",
+        "alt": "Ein Mitarbeiter sichert den Ballen eines großen Baumes, der auf Holzböcken liegt, dahinter ein Mobilbagger"
+      },
+      {
+        "image": "/src/assets/images/impression-31.jpg",
+        "alt": "Fünf Mitarbeiter in Arbeitskleidung neben einem frisch gepflanzten Baum in einem Innenhof"
+      },
+      {
+        "image": "/src/assets/images/impression-32.jpg",
+        "alt": "Ein Mitarbeiter wässert frisch gepflanzte Bäume vor einer hohen Lebensbaum-Hecke"
+      },
+      {
+        "image": "/src/assets/images/impression-33.jpg",
+        "alt": "Drei Mitarbeiter liefern einen großen Baum mit Ballen in einen Garten, daneben der Lieferwagen"
+      },
+      {
+        "image": "/src/assets/images/impression-34.jpg",
+        "alt": "Eine Mitarbeiterin zwischen blühendem Lavendel im Gewächshaus"
+      },
+      {
+        "image": "/src/assets/images/impression-35.jpg",
+        "alt": "Zwei Mitarbeiter roden mit einer grünen Rodemaschine einen Nadelbaum"
+      },
+      {
+        "image": "/src/assets/images/impression-36.jpg",
+        "alt": "Ein Quartier mit Reihen frisch gepflanzter Bäume unter bewölktem Himmel"
+      },
+      {
+        "image": "/src/assets/images/impression-37.jpg",
+        "alt": "Zwei Hunde liegen auf dem Hofweg vor dem Gewächshaus"
+      },
+      {
+        "image": "/src/assets/images/impression-38.jpg",
+        "alt": "Ein mit Bäumen beladener Lkw der Baumschule mit einem Anhänger, auf dem ein Minibagger steht"
+      }
+    ]
+  },
+  "partners": [
+    {
+      "name": "Pflanzenschutzamt Berlin",
+      "url": "https://www.stadtentwicklung.berlin.de/pflanzenschutz/pflanzenschutzamt",
+      "description": ""
+    },
+    {
+      "name": "Bund Deutscher Baumschulen",
+      "url": "https://www.gruen-ist-leben.de",
+      "description": ""
+    },
+    {
+      "name": "Bundessortenamt",
+      "url": "https://www.bundessortenamt.de",
+      "description": ""
+    },
+    {
+      "name": "Gabot – Suchmaschine für den Gartenbau",
+      "url": "https://www.gabot.de",
+      "description": ""
+    },
+    {
+      "name": "Julius Kühn-Institut",
+      "url": "http://www.jki.bund.de/",
+      "description": ""
+    },
+    {
+      "name": "Deutsche Dendrologische Gesellschaft",
+      "url": "https://www.ddg-web.de",
+      "description": ""
+    },
+    {
+      "name": "Baumschultechnik",
+      "url": "https://www.baumschultechnik.de",
+      "description": ""
+    },
+    {
+      "name": "Berliner Staudenmarkt",
+      "url": "https://www.berliner-staudenmarkt.de",
+      "description": ""
+    },
+    {
+      "name": "Baum des Jahres",
+      "url": "https://www.baum-des-jahres.de",
+      "description": ""
+    },
+    {
+      "name": "Gartenbauverband",
+      "url": "https://www.gartenbau-bb.de",
+      "description": ""
+    }
+  ]
+}
