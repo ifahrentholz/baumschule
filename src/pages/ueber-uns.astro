@@ -1,5 +1,129 @@
 ---
+// "Über uns" from the singleton of the same name (`src/about.ts`): the
+// history timeline, the impressions gallery (the old /spaziergang-2/ page)
+// and the partner links (the old /ueber-uns/partner/ page, its intro
+// sentence kept here). Each section is left out while its list is empty.
+import { Image } from "astro:assets";
+import { loadAbout } from "../about-entries";
 import PageShell from "../layouts/PageShell.astro";
+
+const { timeline, impressions, partners } = loadAbout();
+const impressionsHeading = impressions.heading ?? "Impressionen";
+const isEmpty =
+  timeline.length === 0 &&
+  impressions.images.length === 0 &&
+  partners.length === 0;
 ---
 
-<PageShell path="/ueber-uns/" />
+{isEmpty ? (
+  <PageShell path="/ueber-uns/" />
+) : (
+  <PageShell path="/ueber-uns/">
+    {timeline.length > 0 && (
+      <section aria-labelledby="geschichte">
+        <h2 id="geschichte">Geschichte</h2>
+        <ol class="timeline">
+          {timeline.map(({ year, text }) => (
+            <li>
+              <span class="year">{year}</span>
+              <p>{text}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    {impressions.images.length > 0 && (
+      <section aria-labelledby="impressionen">
+        <h2 id="impressionen">{impressionsHeading}</h2>
+        {impressions.intro && <p>{impressions.intro}</p>}
+        <ul class="gallery" aria-label={`Bilder: ${impressionsHeading}`}>
+          {impressions.images.map(({ image, alt }) => (
+            <li>
+              <Image
+                src={image}
+                alt={alt}
+                widths={[320, 640, 960]}
+                sizes="(min-width: 40rem) 15rem, 50vw"
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {partners.length > 0 && (
+      <section aria-labelledby="links">
+        <h2 id="links">Links</h2>
+        <p>
+          Wir haben hier für Sie einige informative gartenbauliche Links
+          zusammengestellt.
+        </p>
+        <ul class="partners">
+          {partners.map(({ name, url, description }) => (
+            <li>
+              <a href={url}>{name}</a>
+              {description && <p>{description}</p>}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </PageShell>
+)}
+
+<style>
+  section + section {
+    margin-block-start: var(--space-l);
+  }
+
+  .timeline {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-inline-start: 3px solid var(--color-leaf);
+  }
+
+  .timeline li {
+    padding-inline-start: var(--space-m);
+    padding-block-end: var(--space-s);
+  }
+
+  .year {
+    display: block;
+    color: var(--color-fir);
+    font-family: var(--font-ui);
+    font-weight: 700;
+  }
+
+  .timeline p {
+    margin: 0;
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+    gap: var(--space-s);
+    margin-block: var(--space-m) 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* The photos mix portrait and landscape; equal tiles keep the rows even. */
+  .gallery :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+
+  .partners {
+    padding-inline-start: var(--space-m);
+  }
+
+  .partners p {
+    margin: 0;
+    color: var(--text-muted);
+  }
+</style>

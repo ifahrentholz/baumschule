@@ -12,6 +12,7 @@
  */
 import type {
   CmsConfig,
+  CollectionFile,
   EntryCollection,
   Field,
   VariableFieldType,
@@ -65,6 +66,12 @@ export const SERVICES_FOLDER = "src/content/services";
  * read by `src/assortment-entries.ts`.
  */
 export const ASSORTMENT_FILE = "src/content/assortment.json";
+
+/**
+ * Repository path of the "Über uns" singleton (timeline, impressions,
+ * partner links), read by `src/about-entries.ts`.
+ */
+export const ABOUT_FILE = "src/content/about.json";
 
 const MONTH_OPTIONS = MONTH_LABELS.map((label, i) => ({
   label,
@@ -167,7 +174,7 @@ function monthDayField(name: string, label: string): Field {
   };
 }
 
-/** The image gallery of an assortment category or a service. */
+/** The image gallery of an assortment category, a service or "Über uns". */
 const GALLERY_FIELD: Field = {
   name: "gallery",
   label: "Bildergalerie",
@@ -420,6 +427,72 @@ const SERVICES: EntryCollection = {
   ],
 };
 
+// Ordered lists in one file instead of collections: editors reorder the
+// items by dragging, and none of them has a page of its own.
+const ABOUT: CollectionFile = {
+  name: "about",
+  label: "Über uns",
+  file: ABOUT_FILE,
+  format: "json",
+  fields: [
+    {
+      name: "timeline",
+      label: "Geschichte",
+      label_singular: "Eintrag",
+      widget: "list",
+      required: false,
+      hint: "Die Einträge stehen auf /ueber-uns/ in der Reihenfolge dieser Liste. Ohne Einträge entfällt der Abschnitt.",
+      summary: "{{fields.year}}: {{fields.text}}",
+      fields: [
+        {
+          name: "year",
+          label: "Jahr",
+          hint: "Wie es auf der Seite stehen soll, z. B. „1955“, „Ende 1950er“ oder „Ab 1970“.",
+        },
+        { name: "text", label: "Text", widget: "text" },
+      ],
+    },
+    {
+      name: "impressions",
+      label: "Impressionen",
+      widget: "object",
+      fields: [
+        {
+          name: "heading",
+          label: "Überschrift",
+          required: false,
+          hint: "Ohne Überschrift steht dort „Impressionen“.",
+        },
+        { name: "intro", label: "Einleitung", widget: "text", required: false },
+        { ...GALLERY_FIELD, name: "images" },
+      ],
+    },
+    {
+      name: "partners",
+      label: "Links",
+      label_singular: "Link",
+      widget: "list",
+      required: false,
+      summary: "{{fields.name}}",
+      fields: [
+        { name: "name", label: "Name" },
+        {
+          name: "url",
+          label: "Adresse",
+          hint: "Vollständige Adresse (https://…).",
+          pattern: ["^https?://", "Mit https:// oder http:// beginnen"],
+        },
+        {
+          name: "description",
+          label: "Beschreibung",
+          widget: "text",
+          required: false,
+        },
+      ],
+    },
+  ],
+};
+
 export interface CmsConfigOptions {
   /** Absolute URL of the site's home page, including the base path. */
   siteUrl: string;
@@ -566,6 +639,7 @@ export function createCmsConfig({ siteUrl }: CmsConfigOptions): CmsConfig {
           },
         ],
       },
+      ABOUT,
     ],
   };
 }

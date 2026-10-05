@@ -1,9 +1,10 @@
 /**
  * Field parsers shared by the CMS collections whose entries are Markdown or
- * JSON files (`src/assortment.ts`, `src/services.ts`). Each throws an `Error`
- * naming the field; the collection parser catches it and skips the entry
- * with `warnSkipped`. The CMS writes empty optional fields as empty strings;
- * those count as missing.
+ * JSON files (`src/assortment.ts`, `src/services.ts`) and by the singletons
+ * with ordered lists (`src/about.ts`, `src/locations.ts`). Each throws an
+ * `Error` naming the field; the collection parser catches it and skips the
+ * entry (or list item) with `warnSkipped`. The CMS writes empty optional
+ * fields as empty strings; those count as missing.
  */
 
 export interface GalleryImage {
@@ -83,4 +84,42 @@ export function text(value: unknown, field: string): string | undefined {
   if (typeof value !== "string") throw new Error(`${field} must be text`);
   const trimmed = value.trim();
   return trimmed === "" ? undefined : trimmed;
+}
+
+/** An absolute http(s) address with a host, as external links need it. */
+export function httpUrl(value: unknown, field: string): string | undefined {
+  const url = text(value, field);
+  if (url !== undefined && !/^https?:\/\/[^\s/]+\.[^\s/]+/.test(url)) {
+    throw new Error(`${field} must be an http:// or https:// address`);
+  }
+  return url;
+}
+
+/**
+ * The valid items of a list field of a singleton, in list order. An invalid
+ * item is skipped with `warnSkipped` and the rest are kept; a value that is
+ * not a list at all counts as an empty list, with a warning.
+ */
+export function validItems<T>(
+  singleton: string,
+  value: unknown,
+  field: string,
+  parseItem: (item: unknown, field: string) => T,
+): T[] {
+  let items: unknown[];
+  try {
+    items = list(value, field);
+  } catch (error) {
+    warnSkipped(singleton, field, error);
+    return [];
+  }
+  return items.flatMap((item, i) => {
+    const itemField = `${field}[${i}]`;
+    try {
+      return [parseItem(item, itemField)];
+    } catch (error) {
+      warnSkipped(singleton, itemField, error);
+      return [];
+    }
+  });
 }

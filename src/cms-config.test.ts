@@ -7,12 +7,14 @@ import type {
 } from "@sveltia/cms";
 import { getFileInfo } from "prettier";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { parseAboutPage } from "./about";
 import {
   parseAssortmentCategories,
   parseAssortmentPage,
   parseCultivarTables,
 } from "./assortment";
 import {
+  ABOUT_FILE,
   ASSORTMENT_FILE,
   ASSORTMENT_FOLDER,
   CULTIVAR_TABLES_FOLDER,
@@ -56,6 +58,12 @@ function entryCollection(name: string): EntryCollection {
 
 function settingsSingleton(): CollectionFile {
   return singleton("settings");
+}
+
+/** The fields of the object or list field `name` among `fields`. */
+function subfields(fields: Field[], name: string): Field[] {
+  const field = fields.find((entry) => "name" in entry && entry.name === name);
+  return field && "fields" in field ? (field.fields ?? []) : [];
 }
 
 function fieldNames(fields: Field[]): string[] {
@@ -360,6 +368,67 @@ describe("the Assortment singleton", () => {
       catalogueUrl:
         "https://baumschule-fischer.de.onlinekatalog.gartenmedien.de/",
     });
+  });
+});
+
+describe("the About singleton", () => {
+  it("edits the file /ueber-uns/ reads, as JSON, with the sections in page order", () => {
+    const about = singleton("about");
+    expect(about.file).toBe(ABOUT_FILE);
+    expect(about.format).toBe("json");
+    expect(fieldNames(about.fields)).toEqual([
+      "timeline",
+      "impressions",
+      "partners",
+    ]);
+  });
+
+  it("edits the impressions with the shared gallery fields", () => {
+    const impressions = subfields(singleton("about").fields, "impressions");
+    expect(fieldNames(impressions)).toEqual(["heading", "intro", "images"]);
+    expect(fieldNames(subfields(impressions, "images"))).toEqual([
+      "image",
+      "alt",
+    ]);
+  });
+});
+
+describe("the committed About singleton", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  // AC-3: the eight entries of the old /ueber-uns/ timeline, in its order.
+  // Only the years are compared: the texts are editable in the CMS.
+  it("holds the old site's eight timeline entries and ten partner links, all valid", () => {
+    const warn = vi.spyOn(console, "warn");
+    const about = parseAboutPage(JSON.parse(readFileSync(ABOUT_FILE, "utf8")));
+    expect(about.timeline.map((entry) => entry.year)).toEqual([
+      "1955",
+      "Ende 1950er",
+      "Ab 1970",
+      "1974",
+      "1982",
+      "1995",
+      "2002",
+      "2008",
+    ]);
+    expect(about.partners).toHaveLength(10);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  // The ~40 photos of the old /spaziergang-2/ page; a missing image only
+  // warns at build time.
+  it("resolves every impression image it names, each with a description", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { loadAbout } = await import("./about-entries");
+    const named = parseAboutPage(JSON.parse(readFileSync(ABOUT_FILE, "utf8")))
+      .impressions.images;
+    const { images } = loadAbout().impressions;
+    expect(named.length).toBeGreaterThanOrEqual(36);
+    expect(images).toHaveLength(named.length);
+    for (const { alt } of images) expect(alt).not.toBe("");
+    expect(warn).not.toHaveBeenCalled();
   });
 });
 
