@@ -1,8 +1,106 @@
 ---
+// Opening hours, directions to the sales site and all locations from the
+// "Standorte" singleton (`src/locations.ts`). The map is a static image
+// linking to OpenStreetMap, not an embed (AC-8, spec D13): the page makes
+// no third-party request and needs no cookie banner.
+import { Image } from "astro:assets";
+import LocationAddress from "../components/LocationAddress.astro";
 import OpeningHours from "../components/OpeningHours.astro";
 import PageShell from "../layouts/PageShell.astro";
+import { loadLocations } from "../location-entries";
+import { LOCATION_ROLE_LABELS } from "../locations";
+
+const locations = loadLocations();
+const sales = locations.find(({ location }) => location.role === "sales");
 ---
 
 <PageShell path="/besuch/" heading="Öffnungszeiten & Anfahrt">
   <OpeningHours />
+
+  {sales && (
+    <section class="directions" aria-labelledby="anfahrt">
+      <h2 id="anfahrt">Anfahrt</h2>
+      <LocationAddress location={sales.location} />
+      {sales.map && (
+        <figure class="map">
+          <a href={sales.map.url}>
+            <Image
+              src={sales.map.image}
+              alt={sales.map.alt}
+              widths={[480, 800, 1200]}
+              sizes="(min-width: 64rem) 40rem, 100vw"
+            />
+          </a>
+          <figcaption>
+            <a href={sales.map.url}>Größere Karte auf OpenStreetMap</a> · Karte:{" "}
+            <a href="https://www.openstreetmap.org/copyright">
+              © OpenStreetMap-Mitwirkende
+            </a>
+          </figcaption>
+        </figure>
+      )}
+    </section>
+  )}
+
+  {locations.length > 0 && (
+    <section aria-labelledby="standorte">
+      <h2 id="standorte">Standorte</h2>
+      <ul class="locations">
+        {locations.map(({ location }) => (
+          <li>
+            <h3>{location.name}</h3>
+            <p class="role">{LOCATION_ROLE_LABELS[location.role]}</p>
+            <LocationAddress location={location} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
 </PageShell>
+
+<style>
+  section {
+    margin-block-start: var(--space-l);
+  }
+
+  .map {
+    margin: var(--space-m) 0 0;
+  }
+
+  .map :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius);
+  }
+
+  .map figcaption {
+    margin-block-start: var(--space-xs);
+    color: var(--text-muted);
+    font-family: var(--font-ui);
+    font-size: var(--step--1);
+  }
+
+  .locations {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: var(--grid-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .locations h3 {
+    margin-block-end: var(--space-2xs);
+    font-size: var(--step-1);
+  }
+
+  .role {
+    margin-block-end: var(--space-xs);
+    color: var(--color-moss);
+    font-family: var(--font-ui);
+    font-size: var(--step--1);
+    font-weight: 700;
+  }
+</style>

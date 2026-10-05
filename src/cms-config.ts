@@ -12,10 +12,12 @@
  */
 import type {
   CmsConfig,
+  CollectionFile,
   EntryCollection,
   Field,
   VariableFieldType,
 } from "@sveltia/cms";
+import { LOCATION_ROLE_LABELS, LOCATION_ROLES } from "./locations";
 import { MONTH_LABELS, WEEKDAY_LABELS, WEEKDAYS } from "./opening-hours";
 
 /** Repository folder for images uploaded through the CMS. */
@@ -65,6 +67,18 @@ export const SERVICES_FOLDER = "src/content/services";
  * read by `src/assortment-entries.ts`.
  */
 export const ASSORTMENT_FILE = "src/content/assortment.json";
+
+/**
+ * Repository path of the "Über uns" singleton (timeline, impressions,
+ * partner links), read by `src/about-entries.ts`.
+ */
+export const ABOUT_FILE = "src/content/about.json";
+
+/**
+ * Repository path of the "Standorte" singleton, read by
+ * `src/location-entries.ts`.
+ */
+export const LOCATIONS_FILE = "src/content/locations.json";
 
 const MONTH_OPTIONS = MONTH_LABELS.map((label, i) => ({
   label,
@@ -167,7 +181,7 @@ function monthDayField(name: string, label: string): Field {
   };
 }
 
-/** The image gallery of an assortment category or a service. */
+/** The image gallery of an assortment category, a service or "Über uns". */
 const GALLERY_FIELD: Field = {
   name: "gallery",
   label: "Bildergalerie",
@@ -420,6 +434,148 @@ const SERVICES: EntryCollection = {
   ],
 };
 
+// Ordered lists in one file instead of collections: editors reorder the
+// items by dragging, and none of them has a page of its own.
+const ABOUT: CollectionFile = {
+  name: "about",
+  label: "Über uns",
+  file: ABOUT_FILE,
+  format: "json",
+  fields: [
+    {
+      name: "timeline",
+      label: "Geschichte",
+      label_singular: "Eintrag",
+      widget: "list",
+      required: false,
+      hint: "Die Einträge stehen auf /ueber-uns/ in der Reihenfolge dieser Liste. Ohne Einträge entfällt der Abschnitt.",
+      summary: "{{fields.year}}: {{fields.text}}",
+      fields: [
+        {
+          name: "year",
+          label: "Jahr",
+          hint: "Wie es auf der Seite stehen soll, z. B. „1955“, „Ende 1950er“ oder „Ab 1970“.",
+        },
+        { name: "text", label: "Text", widget: "text" },
+      ],
+    },
+    {
+      name: "impressions",
+      label: "Impressionen",
+      widget: "object",
+      fields: [
+        {
+          name: "heading",
+          label: "Überschrift",
+          required: false,
+          hint: "Ohne Überschrift steht dort „Impressionen“.",
+        },
+        { name: "intro", label: "Einleitung", widget: "text", required: false },
+        { ...GALLERY_FIELD, name: "images" },
+      ],
+    },
+    {
+      name: "partners",
+      label: "Links",
+      label_singular: "Link",
+      widget: "list",
+      required: false,
+      summary: "{{fields.name}}",
+      fields: [
+        { name: "name", label: "Name" },
+        {
+          name: "url",
+          label: "Adresse",
+          hint: "Vollständige Adresse (https://…).",
+          pattern: ["^https?://", "Mit https:// oder http:// beginnen"],
+        },
+        {
+          name: "description",
+          label: "Beschreibung",
+          widget: "text",
+          required: false,
+        },
+      ],
+    },
+  ],
+};
+
+// An ordered list like "Über uns": /besuch/ lists the locations in this
+// order, and the first sales location gets the directions and the map.
+const LOCATIONS: CollectionFile = {
+  name: "locations",
+  label: "Standorte",
+  file: LOCATIONS_FILE,
+  format: "json",
+  fields: [
+    {
+      name: "locations",
+      label: "Standorte",
+      label_singular: "Standort",
+      widget: "list",
+      required: false,
+      summary: "{{fields.name}}",
+      hint: "Die Standorte stehen auf /besuch/ in dieser Reihenfolge. Der erste Standort mit Verkauf bekommt dort die Anfahrt mit Karte.",
+      fields: [
+        { name: "name", label: "Name", hint: "Z. B. „Berlin“." },
+        {
+          name: "role",
+          label: "Art",
+          widget: "select",
+          options: LOCATION_ROLES.map((value) => ({
+            label: LOCATION_ROLE_LABELS[value],
+            value,
+          })),
+        },
+        {
+          name: "company",
+          label: "Firma",
+          required: false,
+          hint: "Nur wenn sie anders heißt als die Baumschule hier, z. B. die polnische Gesellschaft.",
+        },
+        { name: "street", label: "Straße und Hausnummer", required: false },
+        { name: "postal_code", label: "PLZ", required: false },
+        { name: "city", label: "Ort" },
+        {
+          name: "country",
+          label: "Land",
+          required: false,
+          hint: "Nur außerhalb Deutschlands.",
+        },
+        { name: "phone", label: "Telefon", required: false },
+        {
+          name: "link",
+          label: "Website",
+          required: false,
+          hint: "Vollständige Adresse (https://…).",
+          pattern: ["^https?://", "Mit https:// oder http:// beginnen"],
+        },
+        {
+          name: "map",
+          label: "Karte",
+          widget: "object",
+          required: false,
+          hint: "Ein Kartenbild, das auf OpenStreetMap verlinkt. Die Seite nennt darunter „Karte: © OpenStreetMap-Mitwirkende“.",
+          fields: [
+            { name: "image", label: "Bild", widget: "image" },
+            {
+              name: "alt",
+              label: "Bildbeschreibung",
+              hint: "Was die Karte zeigt, für Menschen, die sie nicht sehen können.",
+            },
+            {
+              name: "url",
+              label: "Adresse auf OpenStreetMap",
+              hint: "Z. B. https://www.openstreetmap.org/?mlat=…&mlon=…#map=17/…/…",
+              pattern: ["^https://", "Mit https:// beginnen"],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
 export interface CmsConfigOptions {
   /** Absolute URL of the site's home page, including the base path. */
   siteUrl: string;
@@ -566,6 +722,8 @@ export function createCmsConfig({ siteUrl }: CmsConfigOptions): CmsConfig {
           },
         ],
       },
+      ABOUT,
+      LOCATIONS,
     ],
   };
 }

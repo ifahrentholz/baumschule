@@ -1,0 +1,33 @@
+---
+// Postal address, phone and website of a location (`src/locations.ts`);
+// fields the CMS left empty are left out.
+import type { Location } from "../locations";
+import { telHref } from "../settings";
+
+interface Props {
+  location: Location;
+}
+
+const { location } = Astro.props;
+const place = [location.postalCode, location.city].filter(Boolean).join(" ");
+const lines = [location.company, location.street, place, location.country];
+const linkLabel = location.link?.replace(/^https?:\/\//, "").replace(/\/$/, "");
+---
+
+<address>
+  {lines.filter(Boolean).map((line) => (
+    <span>{line}</span>
+  ))}
+  {location.phone && (
+    <span>
+      Telefon: <a href={telHref(location.phone)}>{location.phone}</a>
+    </span>
+  )}
+  {location.link && <a href={location.link}>{linkLabel}</a>}
+</address>
+
+<style>
+  address > * {
+    display: block;
+  }
+</style>
