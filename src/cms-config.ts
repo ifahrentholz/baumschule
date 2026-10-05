@@ -17,6 +17,7 @@ import type {
   Field,
   VariableFieldType,
 } from "@sveltia/cms";
+import { LOCATION_ROLE_LABELS, LOCATION_ROLES } from "./locations";
 import { MONTH_LABELS, WEEKDAY_LABELS, WEEKDAYS } from "./opening-hours";
 
 /** Repository folder for images uploaded through the CMS. */
@@ -72,6 +73,12 @@ export const ASSORTMENT_FILE = "src/content/assortment.json";
  * partner links), read by `src/about-entries.ts`.
  */
 export const ABOUT_FILE = "src/content/about.json";
+
+/**
+ * Repository path of the "Standorte" singleton, read by
+ * `src/location-entries.ts`.
+ */
+export const LOCATIONS_FILE = "src/content/locations.json";
 
 const MONTH_OPTIONS = MONTH_LABELS.map((label, i) => ({
   label,
@@ -493,6 +500,82 @@ const ABOUT: CollectionFile = {
   ],
 };
 
+// An ordered list like "Über uns": /besuch/ lists the locations in this
+// order, and the first sales location gets the directions and the map.
+const LOCATIONS: CollectionFile = {
+  name: "locations",
+  label: "Standorte",
+  file: LOCATIONS_FILE,
+  format: "json",
+  fields: [
+    {
+      name: "locations",
+      label: "Standorte",
+      label_singular: "Standort",
+      widget: "list",
+      required: false,
+      summary: "{{fields.name}}",
+      hint: "Die Standorte stehen auf /besuch/ in dieser Reihenfolge. Der erste Standort mit Verkauf bekommt dort die Anfahrt mit Karte.",
+      fields: [
+        { name: "name", label: "Name", hint: "Z. B. „Berlin“." },
+        {
+          name: "role",
+          label: "Art",
+          widget: "select",
+          options: LOCATION_ROLES.map((value) => ({
+            label: LOCATION_ROLE_LABELS[value],
+            value,
+          })),
+        },
+        {
+          name: "company",
+          label: "Firma",
+          required: false,
+          hint: "Nur wenn sie anders heißt als die Baumschule hier, z. B. die polnische Gesellschaft.",
+        },
+        { name: "street", label: "Straße und Hausnummer", required: false },
+        { name: "postal_code", label: "PLZ", required: false },
+        { name: "city", label: "Ort" },
+        {
+          name: "country",
+          label: "Land",
+          required: false,
+          hint: "Nur außerhalb Deutschlands.",
+        },
+        { name: "phone", label: "Telefon", required: false },
+        {
+          name: "link",
+          label: "Website",
+          required: false,
+          hint: "Vollständige Adresse (https://…).",
+          pattern: ["^https?://", "Mit https:// oder http:// beginnen"],
+        },
+        {
+          name: "map",
+          label: "Karte",
+          widget: "object",
+          required: false,
+          hint: "Ein Kartenbild, das auf OpenStreetMap verlinkt. Die Seite nennt darunter „Karte: © OpenStreetMap-Mitwirkende“.",
+          fields: [
+            { name: "image", label: "Bild", widget: "image" },
+            {
+              name: "alt",
+              label: "Bildbeschreibung",
+              hint: "Was die Karte zeigt, für Menschen, die sie nicht sehen können.",
+            },
+            {
+              name: "url",
+              label: "Adresse auf OpenStreetMap",
+              hint: "Z. B. https://www.openstreetmap.org/?mlat=…&mlon=…#map=17/…/…",
+              pattern: ["^https://", "Mit https:// beginnen"],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
 export interface CmsConfigOptions {
   /** Absolute URL of the site's home page, including the base path. */
   siteUrl: string;
@@ -640,6 +723,7 @@ export function createCmsConfig({ siteUrl }: CmsConfigOptions): CmsConfig {
         ],
       },
       ABOUT,
+      LOCATIONS,
     ],
   };
 }

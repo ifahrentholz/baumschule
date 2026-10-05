@@ -19,6 +19,7 @@ import {
   ASSORTMENT_FOLDER,
   CULTIVAR_TABLES_FOLDER,
   IMAGE_FOLDER,
+  LOCATIONS_FILE,
   NOTICES_FOLDER,
   OPENING_HOURS_FILE,
   SEASONAL_OFFERS_FOLDER,
@@ -26,6 +27,7 @@ import {
   SETTINGS_FILE,
   createCmsConfig,
 } from "./cms-config";
+import { parseLocations } from "./locations";
 import { ASSORTMENT_CATEGORIES, SERVICES } from "./navigation";
 import { parseNotices } from "./notices";
 import { parseOpeningHours, weekRows } from "./opening-hours";
@@ -428,6 +430,77 @@ describe("the committed About singleton", () => {
     expect(named.length).toBeGreaterThanOrEqual(36);
     expect(images).toHaveLength(named.length);
     for (const { alt } of images) expect(alt).not.toBe("");
+    expect(warn).not.toHaveBeenCalled();
+  });
+});
+
+describe("the Locations singleton", () => {
+  it("edits the file /besuch/ reads, as JSON, as one ordered list", () => {
+    const locations = singleton("locations");
+    expect(locations.file).toBe(LOCATIONS_FILE);
+    expect(locations.format).toBe("json");
+    expect(fieldNames(locations.fields)).toEqual(["locations"]);
+    expect(fieldNames(subfields(locations.fields, "locations"))).toEqual([
+      "name",
+      "role",
+      "company",
+      "street",
+      "postal_code",
+      "city",
+      "country",
+      "phone",
+      "link",
+      "map",
+    ]);
+  });
+
+  it("offers exactly the roles the site knows, so a save cannot produce an unknown one", () => {
+    const role = subfields(singleton("locations").fields, "locations").find(
+      (field) => "name" in field && field.name === "role",
+    );
+    expect(role).toMatchObject({
+      widget: "select",
+      options: [
+        { label: "Verkauf", value: "sales" },
+        { label: "nur Produktion", value: "production" },
+      ],
+    });
+  });
+});
+
+describe("the committed Locations singleton", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  // AC-3: Berlin (sales) and the production sites Wölpinghausen and
+  // Sokolniki from the old /kontakt/ and /ueber-uns/filialen/ pages.
+  it("holds the three locations of the old site, all valid, one of them for sales", () => {
+    const warn = vi.spyOn(console, "warn");
+    const locations = parseLocations(
+      JSON.parse(readFileSync(LOCATIONS_FILE, "utf8")),
+    );
+    expect(locations.map(({ city, role }) => ({ city, role }))).toEqual([
+      { city: "Berlin", role: "sales" },
+      { city: "Wölpinghausen", role: "production" },
+      { city: "Maszewo", role: "production" },
+    ]);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  // AC-8, spec D13: the directions on /besuch/ show a static map that links
+  // to OpenStreetMap; a missing image only warns at build time.
+  it("gives the sales location a map image that exists and links to OpenStreetMap", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { loadLocations } = await import("./location-entries");
+    const sales = loadLocations().find(
+      ({ location }) => location.role === "sales",
+    );
+    expect(sales?.map?.image).toBeDefined();
+    expect(sales?.map?.alt).not.toBe("");
+    expect(sales?.map?.url).toMatch(
+      /^https:\/\/www\.openstreetmap\.org\/\?mlat=/,
+    );
     expect(warn).not.toHaveBeenCalled();
   });
 });

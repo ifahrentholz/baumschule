@@ -1,0 +1,42 @@
+{
+  "locations": [
+    {
+      "name": "Berlin",
+      "role": "sales",
+      "company": "Baumschulen Ewald Fischer",
+      "street": "Lettberger Str. 95",
+      "postal_code": "12355",
+      "city": "Berlin",
+      "country": "",
+      "phone": "+49 30 6635041",
+      "link": "",
+      "map": {
+        "image": "/src/assets/images/karte-berlin.jpg",
+        "alt": "Stadtplan von Berlin-Rudow: Die Baumschule liegt an der Lettberger Straße 95, westlich der Autobahn A 113 und südlich des Mozartrings.",
+        "url": "https://www.openstreetmap.org/?mlat=52.41095&mlon=13.52104#map=17/52.41095/13.52104"
+      }
+    },
+    {
+      "name": "Wölpinghausen",
+      "role": "production",
+      "company": "",
+      "street": "Unter den Buchen 2",
+      "postal_code": "31556",
+      "city": "Wölpinghausen",
+      "country": "",
+      "phone": "",
+      "link": ""
+    },
+    {
+      "name": "Sokolniki",
+      "role": "production",
+      "company": "Fischer Polsko-Niemiecka Szkółka Drzewiarska Sp. z o.o.",
+      "street": "Sokolniki",
+      "postal_code": "72-130",
+      "city": "Maszewo",
+      "country": "Polen",
+      "phone": "",
+      "link": "https://drzewkafischer.pl"
+    }
+  ]
+}
