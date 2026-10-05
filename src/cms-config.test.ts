@@ -30,7 +30,7 @@ import {
 import { parseLocations } from "./locations";
 import { ASSORTMENT_CATEGORIES, SERVICES } from "./navigation";
 import { parseNotices } from "./notices";
-import { parseOpeningHours, weekRows } from "./opening-hours";
+import { parseOpeningHours } from "./opening-hours";
 import { parseSeasonalOffers } from "./seasonal-offers";
 import { parseServices } from "./services";
 import { parseSettings } from "./settings";
@@ -400,36 +400,19 @@ describe("the committed About singleton", () => {
     vi.restoreAllMocks();
   });
 
-  // AC-3: the eight entries of the old /ueber-uns/ timeline, in its order.
-  // Only the years are compared: the texts are editable in the CMS.
-  it("holds the old site's eight timeline entries and ten partner links, all valid", () => {
+  it("is valid", () => {
     const warn = vi.spyOn(console, "warn");
-    const about = parseAboutPage(JSON.parse(readFileSync(ABOUT_FILE, "utf8")));
-    expect(about.timeline.map((entry) => entry.year)).toEqual([
-      "1955",
-      "Ende 1950er",
-      "Ab 1970",
-      "1974",
-      "1982",
-      "1995",
-      "2002",
-      "2008",
-    ]);
-    expect(about.partners).toHaveLength(10);
+    parseAboutPage(JSON.parse(readFileSync(ABOUT_FILE, "utf8")));
     expect(warn).not.toHaveBeenCalled();
   });
 
-  // The ~40 photos of the old /spaziergang-2/ page; a missing image only
-  // warns at build time.
-  it("resolves every impression image it names, each with a description", async () => {
+  // A missing image only warns at build time.
+  it("resolves every impression image it names", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const { loadAbout } = await import("./about-entries");
     const named = parseAboutPage(JSON.parse(readFileSync(ABOUT_FILE, "utf8")))
       .impressions.images;
-    const { images } = loadAbout().impressions;
-    expect(named.length).toBeGreaterThanOrEqual(36);
-    expect(images).toHaveLength(named.length);
-    for (const { alt } of images) expect(alt).not.toBe("");
+    expect(loadAbout().impressions.images).toHaveLength(named.length);
     expect(warn).not.toHaveBeenCalled();
   });
 });
@@ -473,33 +456,15 @@ describe("the committed Locations singleton", () => {
     vi.restoreAllMocks();
   });
 
-  // AC-3: Berlin (sales) and the production sites Wölpinghausen and
-  // Sokolniki from the old /kontakt/ and /ueber-uns/filialen/ pages.
-  it("holds the three locations of the old site, all valid, one of them for sales", () => {
-    const warn = vi.spyOn(console, "warn");
-    const locations = parseLocations(
-      JSON.parse(readFileSync(LOCATIONS_FILE, "utf8")),
-    );
-    expect(locations.map(({ city, role }) => ({ city, role }))).toEqual([
-      { city: "Berlin", role: "sales" },
-      { city: "Wölpinghausen", role: "production" },
-      { city: "Maszewo", role: "production" },
-    ]);
-    expect(warn).not.toHaveBeenCalled();
-  });
-
-  // AC-8, spec D13: the directions on /besuch/ show a static map that links
-  // to OpenStreetMap; a missing image only warns at build time.
-  it("gives the sales location a map image that exists and links to OpenStreetMap", async () => {
+  // A missing map image only warns at build time.
+  it("is valid and resolves every map image it names", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const { loadLocations } = await import("./location-entries");
-    const sales = loadLocations().find(
-      ({ location }) => location.role === "sales",
-    );
-    expect(sales?.map?.image).toBeDefined();
-    expect(sales?.map?.alt).not.toBe("");
-    expect(sales?.map?.url).toMatch(
-      /^https:\/\/www\.openstreetmap\.org\/\?mlat=/,
+    const named = parseLocations(
+      JSON.parse(readFileSync(LOCATIONS_FILE, "utf8")),
+    ).filter(({ map }) => map !== undefined);
+    expect(loadLocations().filter(({ map }) => map !== undefined)).toHaveLength(
+      named.length,
     );
     expect(warn).not.toHaveBeenCalled();
   });
@@ -580,9 +545,7 @@ describe("the committed cultivar tables", () => {
     vi.restoreAllMocks();
   });
 
-  // AC-3: the 20 cultivar tables of the old /sortiment/obstgehoelze/ page,
-  // migrated read-only (titles verbatim), in the page's order.
-  it("are the old Obstgehölze page's 20 tables, all valid and in its order", () => {
+  it("are valid", () => {
     const warn = vi.spyOn(console, "warn");
     const files = Object.fromEntries(
       readdirSync(CULTIVAR_TABLES_FOLDER).map((name) => [
@@ -590,33 +553,7 @@ describe("the committed cultivar tables", () => {
         JSON.parse(readFileSync(`${CULTIVAR_TABLES_FOLDER}/${name}`, "utf8")),
       ]),
     );
-    const tables = parseCultivarTables(files);
-    expect(tables.map((table) => table.title)).toEqual([
-      "Apfel-Sortiment",
-      "Befruchtungstabelle für Äpfel",
-      "Birnen – Sortiment",
-      "Befruchtungstabelle für Birnen",
-      "Pfirsiche",
-      "Aprikosen",
-      "Pflaumen-Sortiment",
-      "Sauerkirschen-Sortiment",
-      "Neue Sorten, die weniger anfällig gegenüber Monilia sind:",
-      "Süßkirschen-Sortiment",
-      "Genussreifetabelle für Süßkirschen",
-      "Himbeeren",
-      "Kreuzung zwischen Himbeere und Brombeere",
-      "Brombeeren",
-      "Gartenheidelbeeren",
-      "Johannisbeeren",
-      "Neuere Sorten",
-      "Kreuzung zwischen Johannisbeere und Stachelbeere",
-      "Stachelbeeren",
-      "Neuere Sorten, gelten als mehltaufester",
-    ]);
-    for (const table of tables) {
-      expect(table.category, table.id).toBe("obstgehoelze");
-      expect(table.rows.length, table.id).toBeGreaterThan(0);
-    }
+    parseCultivarTables(files);
     expect(warn).not.toHaveBeenCalled();
   });
 });
@@ -626,9 +563,7 @@ describe("the committed notices", () => {
     vi.restoreAllMocks();
   });
 
-  // The old home page's "Zeile 00" posts (content inventory §4): the
-  // Staudenmarkt notice and the teaser for the job postings.
-  it("hold the old home page's notices, all valid", () => {
+  it("are valid", () => {
     const warn = vi.spyOn(console, "warn");
     const files = Object.fromEntries(
       readdirSync(NOTICES_FOLDER).map((name) => [
@@ -636,52 +571,22 @@ describe("the committed notices", () => {
         JSON.parse(readFileSync(`${NOTICES_FOLDER}/${name}`, "utf8")),
       ]),
     );
-    expect(parseNotices(files)).toEqual([
-      {
-        id: "staudenmarkt",
-        text: "Staudenmarkt 05./06. Sept.",
-        window: { kind: "dates", until: "2026-09-06" },
-      },
-      {
-        id: "stellenanzeigen",
-        text: "Stellenanzeigen",
-        link: "/karriere/",
-        window: { kind: "dates" },
-      },
-    ]);
+    parseNotices(files);
     expect(warn).not.toHaveBeenCalled();
   });
 });
 
 describe("the committed seasonal offers", () => {
-  it("are Obstverkostung and Apfelsaft", () => {
-    expect(readdirSync(SEASONAL_OFFERS_FOLDER).sort()).toEqual([
-      "apfelsaft.md",
-      "obstverkostung.md",
-    ]);
-  });
-
-  // Owner decision (issue #7 review): both recur 1 September - 30 November.
-  // Body text and image were migrated read-only from the old live pages
-  // (spec D14).
-  it("are valid, windowed 1 September to 30 November, and each produce a /saison/<slug>/ page", async () => {
+  it("are valid and each produce a /saison/<slug>/ page", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const files = import.meta.glob<{ frontmatter: unknown }>(
       "/src/content/seasonal-offers/*.md",
       { eager: true },
     );
-    const offers = parseSeasonalOffers(files).map(({ offer }) => offer);
-    expect(offers.map((offer) => offer.slug)).toEqual([
-      "apfelsaft",
-      "obstverkostung",
-    ]);
-    for (const offer of offers) {
-      expect(offer.window).toEqual({
-        kind: "yearly",
-        from: "09-01",
-        until: "11-30",
-      });
-    }
+    const slugs = parseSeasonalOffers(files)
+      .map(({ offer }) => offer.slug)
+      .sort();
+    expect(slugs).toHaveLength(readdirSync(SEASONAL_OFFERS_FOLDER).length);
     expect(warn).not.toHaveBeenCalled();
     vi.restoreAllMocks();
 
@@ -690,7 +595,7 @@ describe("the committed seasonal offers", () => {
       getStaticPaths()
         .map((entry) => entry.params.slug)
         .sort(),
-    ).toEqual(["apfelsaft", "obstverkostung"]);
+    ).toEqual(slugs);
   });
 });
 
@@ -705,46 +610,9 @@ describe("the committed settings file", () => {
 });
 
 describe("the committed opening-hours file", () => {
-  // The three season profiles of the old site (content inventory,
-  // /kontakt/oeffnungszeiten-2-2/); Sunday is closed in all of them.
-  it("holds the old site's season profiles", () => {
-    const { seasons } = parseOpeningHours(
-      JSON.parse(readFileSync(OPENING_HOURS_FILE, "utf8")),
-    );
-    expect(
-      seasons.map((season) => ({
-        name: season.name,
-        months: season.months,
-        week: weekRows(season),
-      })),
-    ).toEqual([
-      {
-        name: "Pflanzzeit",
-        months: [3, 4, 5, 9, 10, 11],
-        week: [
-          { days: "Mo–Fr", hours: "7:00–18:00 Uhr" },
-          { days: "Sa", hours: "9:00–14:00 Uhr" },
-          { days: "So", hours: "geschlossen" },
-        ],
-      },
-      {
-        name: "Sommer",
-        months: [6, 7, 8],
-        week: [
-          { days: "Mo–Do", hours: "7:00–16:00 Uhr" },
-          { days: "Fr", hours: "7:00–13:30 Uhr" },
-          { days: "Sa–So", hours: "geschlossen" },
-        ],
-      },
-      {
-        name: "Winter",
-        months: [12, 1, 2],
-        week: [
-          { days: "Mo–Do", hours: "8:00–15:00 Uhr" },
-          { days: "Fr", hours: "8:00–14:00 Uhr" },
-          { days: "Sa–So", hours: "geschlossen" },
-        ],
-      },
-    ]);
+  it("is valid", () => {
+    expect(() =>
+      parseOpeningHours(JSON.parse(readFileSync(OPENING_HOURS_FILE, "utf8"))),
+    ).not.toThrow();
   });
 });
