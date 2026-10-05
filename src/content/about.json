@@ -38,12 +38,12 @@
     "intro": "Das Gelände der Baumschule Fischer steht Ihnen während unserer Öffnungszeiten jederzeit für einen Spaziergang offen.",
     "images": [
       {
-        "image": "/src/assets/images/impression-01.jpg",
-        "alt": "Rad- und Fußweg am Baumschulgelände mit dem Schild „Baumschulen Ewald Fischer“ vor Säulen-Koniferen und Bäumen"
-      },
-      {
         "image": "/src/assets/images/impression-02.jpg",
         "alt": "Rotes Laub eines Baumes im Gegenlicht vor blauem Himmel"
+      },
+      {
+        "image": "/src/assets/images/impression-01.jpg",
+        "alt": "Rad- und Fußweg am Baumschulgelände mit dem Schild „Baumschulen Ewald Fischer“ vor Säulen-Koniferen und Bäumen"
       },
       {
         "image": "/src/assets/images/impression-03.jpg",
