@@ -55,6 +55,12 @@ export const ASSORTMENT_FOLDER = "src/content/assortment";
 export const CULTIVAR_TABLES_FOLDER = "src/content/cultivar-tables";
 
 /**
+ * Repository folder of the Services collection, one Markdown file per
+ * service, read by `src/service-entries.ts`.
+ */
+export const SERVICES_FOLDER = "src/content/services";
+
+/**
  * Repository path of the Assortment singleton (the online catalogue link),
  * read by `src/assortment-entries.ts`.
  */
@@ -160,6 +166,24 @@ function monthDayField(name: string, label: string): Field {
     ],
   };
 }
+
+/** The image gallery of an assortment category or a service. */
+const GALLERY_FIELD: Field = {
+  name: "gallery",
+  label: "Bildergalerie",
+  label_singular: "Bild",
+  widget: "list",
+  required: false,
+  fields: [
+    { name: "image", label: "Bild", widget: "image" },
+    {
+      name: "alt",
+      label: "Bildbeschreibung",
+      required: false,
+      hint: "Was auf dem Bild zu sehen ist, für Menschen, die es nicht sehen können.",
+    },
+  ],
+};
 
 const NOTICES: EntryCollection = {
   name: "notices",
@@ -279,22 +303,7 @@ const ASSORTMENT_CATEGORIES: EntryCollection = {
         { name: "text", label: "Text", widget: "text", required: false },
       ],
     },
-    {
-      name: "gallery",
-      label: "Bildergalerie",
-      label_singular: "Bild",
-      widget: "list",
-      required: false,
-      fields: [
-        { name: "image", label: "Bild", widget: "image" },
-        {
-          name: "alt",
-          label: "Bildbeschreibung",
-          required: false,
-          hint: "Was auf dem Bild zu sehen ist, für Menschen, die es nicht sehen können.",
-        },
-      ],
-    },
+    GALLERY_FIELD,
   ],
 };
 
@@ -368,6 +377,49 @@ const CULTIVAR_TABLES: EntryCollection = {
   ],
 };
 
+const SERVICES: EntryCollection = {
+  name: "services",
+  label: "Service",
+  label_singular: "Leistung",
+  description:
+    "Die vier Leistungen (Beratung, Qualität, Lieferservice, Pflanzung). Jede hat eine eigene Seite unter /service/<Kurzname>/; die Reihenfolge bestimmt die Übersicht /service/.",
+  folder: SERVICES_FOLDER,
+  extension: "md",
+  format: "yaml-frontmatter",
+  // Fixed by the page tree (`src/navigation.ts`) like the assortment
+  // categories: no adding, deleting or duplicating, so no CMS save can break
+  // a navigation link.
+  create: false,
+  delete: false,
+  duplicate: false,
+  fields: [
+    { name: "title", label: "Titel" },
+    {
+      name: "order",
+      label: "Reihenfolge",
+      widget: "number",
+      value_type: "int",
+      required: false,
+      hint: "Kleinere Zahlen stehen in der Übersicht weiter vorn.",
+    },
+    {
+      name: "teaser",
+      label: "Teaser-Text",
+      widget: "text",
+      required: false,
+      hint: "Steht in der Übersicht /service/ und oben auf der Seite.",
+    },
+    {
+      name: "teaser_image",
+      label: "Teaser-Bild",
+      widget: "image",
+      required: false,
+    },
+    { name: "body", label: "Text", widget: "markdown", required: false },
+    GALLERY_FIELD,
+  ],
+};
+
 export interface CmsConfigOptions {
   /** Absolute URL of the site's home page, including the base path. */
   siteUrl: string;
@@ -394,6 +446,7 @@ export function createCmsConfig({ siteUrl }: CmsConfigOptions): CmsConfig {
       SEASONAL_OFFERS,
       ASSORTMENT_CATEGORIES,
       CULTIVAR_TABLES,
+      SERVICES,
     ],
     singletons: [
       {
